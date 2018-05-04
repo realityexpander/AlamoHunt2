@@ -10,6 +10,7 @@
 package com.realityexpander.alamohunt;
 
 import android.content.Context;
+import android.content.Intent;
 import android.location.Location;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
@@ -55,17 +56,16 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
 
             // Creates an intent to direct the user to a map view
             Context context = name.getContext();
-//            // CDA FIX
-//            // Intent i = new Intent(context, MapsActivity.class);
-//
-//            // Passes the crucial venue details onto the map view
-//            i.putExtra("name", name.getText());
-//            i.putExtra("ID", id);
-//            i.putExtra("latitude", latitude);
-//            i.putExtra("longitude", longitude);
-//
-//            // Transitions to the map view.
-//            context.startActivity(i);
+             Intent i = new Intent(context, MapsActivity.class);
+
+            // Passes the crucial venue details onto the map view
+            i.putExtra("name", name.getText());
+            i.putExtra("ID", id);
+            i.putExtra("latitude", latitude);
+            i.putExtra("longitude", longitude);
+
+            // Transitions to the map view.
+            context.startActivity(i);
         }
     }
 
