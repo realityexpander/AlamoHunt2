@@ -1,12 +1,12 @@
 package com.realityexpander.alamohunt;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -21,6 +21,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -28,39 +29,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
-
-
-//public class PlacePickerActivity extends AppCompatActivity {
-//
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.activity_place_picker);
-//
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        toolbar.setTitle("Search results");
-//        toolbar.setNavigationIcon(android.support.design.R.drawable.abc_ic_ab_back_material);
-//        setSupportActionBar(toolbar);
-//        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                startActivity(new Intent(getApplicationContext(),MainActivity.class));
-//            }
-//        });
-//
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//            }
-//        });
-//
-//
-//    }
-//
-//}
 
 
 public class PlacePickerActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -84,12 +52,16 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
     private String foursquareClientSecret;
     private String searchString;
 
+    // The list of frsResults from the Foursquare API
+    List<FoursquareResults> frsResults;
+    private ArrayList<Venue> venueResults;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_picker);
 
+        // Setup the toolbar UI elements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Searching...");
         toolbar.setNavigationIcon(android.support.design.R.drawable.abc_ic_ab_back_material);
@@ -97,16 +69,46 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getApplicationContext(),MainActivity.class));
+                finish();
+//                startActivity(new Intent(getApplicationContext(),MainActivity.class));
             }
         });
 
+        // The FAB shows all the venues on a map
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+
+                if(frsResults == null)
+                    return;
+
+                // Creates an intent to direct the user to a multi-venue map view
+                Context context = getApplicationContext();
+                Intent i = new Intent(context, MapsActivity.class);
+
+                // Build the list of venues from the foursquare response
+                venueResults = new ArrayList<>();
+                for(int n = 0; n< frsResults.size(); n++) {
+                    venueResults.add(new Venue( frsResults.get(n).venue.name,
+                                                frsResults.get(n).venue.id,
+                                                frsResults.get(n).venue.categories.get(0).name,
+                                                frsResults.get(n).venue.location.lat,
+                                                frsResults.get(n).venue.location.lng) );
+                }
+
+                // Passes the crucial venue details onto the map view
+//                i.putExtra("name", frsResults.get(0).venue.name);
+//                i.putExtra("ID", frsResults.get(0).venue.id);
+//                i.putExtra("latitude", frsResults.get(0).venue.location.lat);
+//                i.putExtra("longitude", frsResults.get(0).venue.location.lng);
+                i.putExtra("venuesList", venueResults);
+
+                // Transitions to the map view.
+                context.startActivity(i);
+
             }
         });
 
@@ -162,13 +164,13 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                 FoursquareService foursquare = retrofit.create(FoursquareService.class);
 
                 // Calls the Foursquare API to explore nearby places
-                Call<FoursquareJSON> coffeeCall = foursquare.searchForPlace(
+                Call<FoursquareJSON> searchCall = foursquare.searchForPlace(
                         foursquareClientID,
                         foursquareClientSecret,
                         // userLL,
                         // userLLAcc,
                         searchString);
-                coffeeCall.enqueue(new Callback<FoursquareJSON>() {
+                searchCall.enqueue(new Callback<FoursquareJSON>() {
                     @Override
                     public void onResponse(Call<FoursquareJSON> call, Response<FoursquareJSON> response) {
 
@@ -178,9 +180,11 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                         FoursquareGroup fg = fr.group;
                         List<FoursquareResults> frs = fg.results;
 
-                        // Displays the results in the RecyclerView
+                        // Displays the frsResults in the RecyclerView
                         placePickerAdapter = new PlacePickerAdapter(getApplicationContext(), frs);
                         placePicker.setAdapter(placePickerAdapter);
+
+                        frsResults = frs;
                     }
 
                     @Override

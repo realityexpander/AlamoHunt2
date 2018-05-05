@@ -1,6 +1,7 @@
 /**
  * Filename: MapActivity.java
- * Author: Matthew Huie
+ * Author: Chris Athanas
+ * Based on Mr. Jitters Foursquare sample app
  *
  * MapActivity represents a map view of a specific venue from PlacePickerActivity.  This activity will
  * allow a user to link back to the Foursquare venue page.
@@ -22,8 +23,11 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.ArrayList;
 
 public class MapsActivity extends FragmentActivity
         implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
@@ -36,6 +40,12 @@ public class MapsActivity extends FragmentActivity
     private String venueName;
     private double venueLatitude;
     private double venueLongitude;
+
+    private ArrayList<Venue> venuesList;
+    private Marker markerAustin;
+
+    private static final double AUSTIN_TX_LATITUDE = 30.2672;
+    private static final double AUSTIN_TX_LONGITUDE = -97.7431;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +64,9 @@ public class MapsActivity extends FragmentActivity
         venueName = venue.getString("name");
         venueLatitude = venue.getDouble("latitude");
         venueLongitude = venue.getDouble("longitude");
+
+        venuesList = (ArrayList<Venue>)getIntent().getSerializableExtra("venuesList");
+
         setTitle(venueName);
     }
 
@@ -71,17 +84,61 @@ public class MapsActivity extends FragmentActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        // Centers and zooms the map into the selected venue
-        LatLng venue = new LatLng(venueLatitude, venueLongitude);
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(venue, 16));
+//        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+//            @Override
+//            public void onMapLoaded() {
+                Marker marker=null;
+                // Creates and displays marker and info window for the venue
+                if(venuesList == null) { // only one venue
+                    // Centers and zooms the map into the selected venue
+                    LatLng venueLatLong = new LatLng(venueLatitude, venueLongitude);
+                    marker = mMap.addMarker(new MarkerOptions()
+                            .position(venueLatLong)
+                            .title(venueName)
+                            .snippet("View on Foursquare"));
 
-        // Creates and displays marker and info window for the venue
-        Marker marker = mMap.addMarker(new MarkerOptions()
-                .position(venue)
-                .title(venueName)
-                .snippet("View on Foursquare"));
-        marker.showInfoWindow();
+                    // Add center of Austin
+                    LatLng austinLatLong = new LatLng(AUSTIN_TX_LATITUDE, AUSTIN_TX_LONGITUDE);
+                    markerAustin = mMap.addMarker(new MarkerOptions()
+                            .position(austinLatLong)
+                            .title("Austin, Texas")
+                            .snippet("Home of the Tacos"));
+
+                    LatLngBounds bounds = new LatLngBounds.Builder()
+                            .include(venueLatLong)
+                            .include(austinLatLong)
+                            .build();
+
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 250));
+                } else { // the list of venues
+
+                    LatLngBounds.Builder builder = new LatLngBounds.Builder();
+                    for(int i=0; i<venuesList.size(); i++) {
+                        Double lat = venuesList.get(i).getLatitude();
+                        Double lng = venuesList.get(i).getLongitude();
+                        LatLng venueLatLong = new LatLng(lat, lng );
+
+                        builder.include(venueLatLong);
+
+                        marker = mMap.addMarker(new MarkerOptions()
+                                .position(venueLatLong)
+                                .title(venuesList.get(i).getName())
+                                .snippet(venuesList.get(i).getCategoryName()));
+                        venuesList.get(i).setMarker(marker);
+                    }
+                    LatLngBounds bounds = builder.build();
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
+                }
+                marker.showInfoWindow();
+
+//            }
+//        });
+
+
         mMap.setOnInfoWindowClickListener(this);
+
+//        LatLng austinLatLong = new LatLng(AUSTIN_TX_LATITUDE, AUSTIN_TX_LONGITUDE);
+//        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(austinLatLong, 16));
 
         // Checks for location permissions at runtime (required for API >= 23)
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
@@ -94,8 +151,28 @@ public class MapsActivity extends FragmentActivity
     @Override
     public void onInfoWindowClick(Marker marker) {
 
+        String theVenueID = null;
+
         // Opens the Foursquare venue page when a user clicks on the info window of the venue
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://foursquare.com/v/" + venueID));
-        startActivity(browserIntent);
+
+        // one or many venues?
+        if(venuesList==null) {
+            theVenueID = venueID;
+            if (!marker.equals(markerAustin)) {
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://foursquare.com/v/" + theVenueID));
+                startActivity(browserIntent);
+        }
+        } else {
+            // Look thru the venueList for a matching marker
+            for (int i = 0; i < venuesList.size(); i++) {
+                if (venuesList.get(i).getMarker().equals(marker)) {
+                    theVenueID = venuesList.get(i).getId();
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://foursquare.com/v/" + theVenueID));
+                    startActivity(browserIntent);
+                }
+            }
+        }
+
+
     }
 }

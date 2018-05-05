@@ -26,7 +26,7 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
     // The application context for getting resources
     private Context context;
 
-    // The list of results from the Foursquare API
+    // The list of frsResults from the Foursquare API
     private List<FoursquareResults> results;
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -57,6 +57,7 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
             // Creates an intent to direct the user to a map view
             Context context = name.getContext();
              Intent i = new Intent(context, MapsActivity.class);
+//             Intent i = new Intent(context, MultiVenueMaps2Activity.class);
 
             // Passes the crucial venue details onto the map view
             i.putExtra("name", name.getText());
@@ -83,30 +84,12 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 
-        // Sets the proper rating colour, referenced from the Foursquare Brand Guide
-        double ratingRaw = results.get(position).venue.rating;
-        if (ratingRaw >= 9.0) {
-            holder.rating.setBackgroundColor(ContextCompat.getColor(context, R.color.FSQKale));
-        } else if (ratingRaw >= 8.0) {
-            holder.rating.setBackgroundColor(ContextCompat.getColor(context, R.color.FSQGuacamole));
-        } else if (ratingRaw >= 7.0) {
-            holder.rating.setBackgroundColor(ContextCompat.getColor(context, R.color.FSQLime));
-        } else if (ratingRaw >= 6.0) {
-            holder.rating.setBackgroundColor(ContextCompat.getColor(context, R.color.FSQBanana));
-        } else if (ratingRaw >= 5.0) {
-            holder.rating.setBackgroundColor(ContextCompat.getColor(context, R.color.FSQOrange));
-        } else if (ratingRaw >= 4.0) {
-            holder.rating.setBackgroundColor(ContextCompat.getColor(context, R.color.FSQMacCheese));
-        } else {
-            holder.rating.setBackgroundColor(ContextCompat.getColor(context, R.color.FSQStrawberry));
-        }
 
         // Sets each view with the appropriate venue details
         holder.name.setText(results.get(position).venue.name);
-//        holder.address.setText(results.get(position).venue.location.address);
+//        holder.address.setText(frsResults.get(position).venue.location.address);
         holder.address.setText(results.get(position).venue.categories.get(0).name);
-        holder.rating.setText(Double.toString(ratingRaw));
-//        holder.distance.setText(Integer.toString(results.get(position).venue.location.distance) + "m");
+//        holder.distance.setText(Integer.toString(frsResults.get(position).venue.location.distance) + "m");
 
         // Calc distance to center of Austin, TX (30.2672° N, 97.7431° W)
         Location locationAustinCenter = new Location("Austin, TX");
@@ -118,6 +101,28 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
         locationVenue.setLongitude(results.get(position).venue.location.lng);
         int distance = (int) locationAustinCenter.distanceTo(locationVenue);
         holder.distance.setText(Integer.toString(distance) + "m");
+
+        // Sets the proper rating colour, referenced from the Foursquare Brand Guide
+//        double ratingRaw = frsResults.get(position).venue.rating;
+        double ratingRaw = distance; // Rating based on distance from Austin, TX, further away is more red
+        if (ratingRaw <= 2500.0) {
+            holder.rating.setBackgroundColor(ContextCompat.getColor(context, R.color.FSQKale));
+        } else if (ratingRaw <= 4000.0) {
+            holder.rating.setBackgroundColor(ContextCompat.getColor(context, R.color.FSQGuacamole));
+        } else if (ratingRaw <= 6000.0) {
+            holder.rating.setBackgroundColor(ContextCompat.getColor(context, R.color.FSQLime));
+        } else if (ratingRaw <= 8000.0) {
+            holder.rating.setBackgroundColor(ContextCompat.getColor(context, R.color.FSQBanana));
+        } else if (ratingRaw <= 12000.0) {
+            holder.rating.setBackgroundColor(ContextCompat.getColor(context, R.color.FSQOrange));
+        } else if (ratingRaw <= 16000.0) {
+            holder.rating.setBackgroundColor(ContextCompat.getColor(context, R.color.FSQMacCheese));
+        } else {
+            holder.rating.setBackgroundColor(ContextCompat.getColor(context, R.color.FSQStrawberry));
+        }
+        double rating =  Math.ceil(Math.max(16000-ratingRaw,0.0)/160.0)/10.0; // 0.0 -> 10.0 based on max distance of 16000m
+        holder.rating.setText( Double.toString(rating) ); //String.valueOf((int) rating) );
+
 
 
         // Stores additional venue details for the map view
