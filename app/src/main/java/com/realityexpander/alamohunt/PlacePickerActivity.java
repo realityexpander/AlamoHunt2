@@ -96,7 +96,12 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                                                 frsResults.get(n).venue.id,
                                                 frsResults.get(n).venue.categories.get(0).name,
                                                 frsResults.get(n).venue.location.lat,
-                                                frsResults.get(n).venue.location.lng) );
+                                                frsResults.get(n).venue.location.lng
+                                                ,
+                                                frsResults.get(n).venue.categories.get(0).icon.prefix
+                                              + "32" // CDA FIX - MAke constant FOURSQUARE_ICON_SIZE
+                                              + frsResults.get(n).venue.categories.get(0).icon.suffix
+                    ) );
                 }
 
                 // Passes the crucial venue details onto the map view
@@ -120,7 +125,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
         // The visible TextView and RecyclerView objects
 //        snapToPlace = (TextView)findViewById(R.id.snapToPlace);
-        placePicker = (RecyclerView)findViewById(R.id.coffeeList);
+        placePicker = (RecyclerView)findViewById(R.id.coffeeList); // CDA FIX change name
 
         // Sets the dimensions, LayoutManager, and dividers for the RecyclerView
         placePicker.setHasFixedSize(true);

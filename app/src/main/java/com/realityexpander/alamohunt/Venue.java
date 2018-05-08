@@ -15,6 +15,7 @@ public class Venue implements Serializable {
     private Double latitude;
     private Double longitude;
     private Marker marker;
+    private String categoryIconURL;
 
 
     public Venue(String name, String id, String categoryName){
@@ -31,6 +32,15 @@ public class Venue implements Serializable {
         this.setLongitude(longitude);
     }
 
+    public Venue(String name, String id, String categoryName, Double latitude, Double longitude, String categoryIconURL){
+        this.setName(name);
+        this.setId(id);
+        this.setCategoryName(categoryName);
+        this.setLatitude(latitude);
+        this.setLongitude(longitude);
+        this.setCategoryIconURL(categoryIconURL);
+    }
+
     public String getName() {
         return name;
     }
@@ -43,6 +53,10 @@ public class Venue implements Serializable {
     public Double getLatitude() {return latitude;}
     public Double getLongitude() {return longitude;}
     public Marker getMarker(){return marker;}
+    public String getCategoryIconURL() {
+        return categoryIconURL;
+    }
+
 
     public void setName(String name) {
         this.name = name;
@@ -60,6 +74,10 @@ public class Venue implements Serializable {
         this.longitude = longitude;
     }
     public void setMarker(Marker marker) {this.marker = marker;}
+    public void setCategoryIconURL(String categoryIconURL) {
+        this.categoryIconURL = categoryIconURL;
+    }
+
 }
 
 //package com.realityexpander.alamohunt;

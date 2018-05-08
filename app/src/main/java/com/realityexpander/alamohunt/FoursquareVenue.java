@@ -26,4 +26,6 @@ public class FoursquareVenue {
 
     List<FoursquareCategories> categories = new ArrayList<FoursquareCategories>();
 
+
+
 }

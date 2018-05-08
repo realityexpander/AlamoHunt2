@@ -17,7 +17,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
@@ -36,9 +39,11 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
         TextView address;
         TextView rating;
         TextView distance;
+        ImageView ivCategoryIcon;
         String id;
         double latitude;
         double longitude;
+        String categoryIconURL;
 
         public ViewHolder(View v) {
             super(v);
@@ -49,21 +54,22 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
             address = (TextView)v.findViewById(R.id.placePickerItemAddress);
             rating = (TextView)v.findViewById(R.id.placePickerItemRating);
             distance = (TextView)v.findViewById(R.id.placePickerItemDistance);
+            ivCategoryIcon = (ImageView)v.findViewById(R.id.placePickerCategoryIcon);
         }
 
         @Override
         public void onClick(View v) {
 
-            // Creates an intent to direct the user to a map view
+            // Creates an intent to direct the user to the single venue map view
             Context context = name.getContext();
              Intent i = new Intent(context, MapsActivity.class);
-//             Intent i = new Intent(context, MultiVenueMaps2Activity.class);
 
             // Passes the crucial venue details onto the map view
             i.putExtra("name", name.getText());
             i.putExtra("ID", id);
             i.putExtra("latitude", latitude);
             i.putExtra("longitude", longitude);
+            i.putExtra("categoryIconURL", categoryIconURL);
 
             // Transitions to the map view.
             context.startActivity(i);
@@ -84,7 +90,6 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 
-
         // Sets each view with the appropriate venue details
         holder.name.setText(results.get(position).venue.name);
 //        holder.address.setText(frsResults.get(position).venue.location.address);
@@ -93,7 +98,7 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
 
         // Calc distance to center of Austin, TX (30.2672° N, 97.7431° W)
         Location locationAustinCenter = new Location("Austin, TX");
-        locationAustinCenter.setLatitude(30.2672);
+        locationAustinCenter.setLatitude(30.2672); // CDA FIX put into strings
         locationAustinCenter.setLongitude(-97.7431);
 
         Location locationVenue = new Location(results.get(position).venue.name);
@@ -124,11 +129,20 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
         holder.rating.setText( Double.toString(rating) ); //String.valueOf((int) rating) );
 
 
-
         // Stores additional venue details for the map view
         holder.id = results.get(position).venue.id;
         holder.latitude = results.get(position).venue.location.lat;
         holder.longitude = results.get(position).venue.location.lng;
+
+        // Load the category icon  CDA FIX
+       holder.categoryIconURL = results.get(position).venue.categories.get(0).icon.prefix + "bg_88" +
+                results.get(position).venue.categories.get(0).icon.suffix;
+        // Picasso.with(context).load(holder.categoryIconURL).into(holder.ivCategoryIcon);
+        Picasso.with(context)
+                .load(holder.categoryIconURL)
+                .resize(95, 95)
+                .into(holder.ivCategoryIcon);
+
     }
 
     @Override
