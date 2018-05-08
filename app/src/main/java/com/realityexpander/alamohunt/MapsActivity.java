@@ -13,10 +13,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -29,7 +31,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
 
-public class MapsActivity extends FragmentActivity
+import static android.view.View.GONE;
+
+public class MapsActivity extends AppCompatActivity
         implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
 
     // The Google Maps object.
@@ -51,23 +55,40 @@ public class MapsActivity extends FragmentActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        //getActionBar().setHomeButtonEnabled(true);
-        //getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-
-        // Retrieves venues details from the intent sent from PlacePickerActivity
+        // Retrieves venue(s) details from the intent sent from PlacePickerActivity
         Bundle venue = getIntent().getExtras();
-        venueID = venue.getString("ID");
-        venueName = venue.getString("name");
-        venueLatitude = venue.getDouble("latitude");
-        venueLongitude = venue.getDouble("longitude");
-
         venuesList = (ArrayList<Venue>)getIntent().getSerializableExtra("venuesList");
 
-        setTitle(venueName);
+        SupportMapFragment mapFragment = null;
+        if (venuesList == null) { // Show Single venue screen
+            mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.map);
+
+            // Hide the multi venue map view
+            LinearLayout ll = findViewById(R.id.multiVenueMap);
+            ll.setVisibility(GONE);
+
+            // Single venue details
+            venueID = venue.getString("ID");
+            venueName = venue.getString("name");
+            venueLatitude = venue.getDouble("latitude");
+            venueLongitude = venue.getDouble("longitude");
+            setTitle(venueName);
+
+        } else { // Show multi venue screen
+            mapFragment = (SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.map2);
+
+            // Hide the single venue map views
+            LinearLayout ll = findViewById(R.id.appbar);
+            ll.setVisibility(GONE);
+            FloatingActionButton fab = findViewById(R.id.fab);
+            fab.setVisibility(GONE);
+        }
+        mapFragment.getMapAsync(this);
+
+
     }
 
     @Override
@@ -84,9 +105,17 @@ public class MapsActivity extends FragmentActivity
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
+        int w = getResources().getDisplayMetrics().widthPixels;
+        int h = getResources().getDisplayMetrics().heightPixels;
+        int padding = (int) (w * 0.12); // offset from edges of the map 12% of screen
+
 //        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
 //            @Override
 //            public void onMapLoaded() {
+//                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 250));
+//            }
+//        });
+
                 Marker marker=null;
                 // Creates and displays marker and info window for the venue
                 if(venuesList == null) { // only one venue
@@ -102,14 +131,15 @@ public class MapsActivity extends FragmentActivity
                     markerAustin = mMap.addMarker(new MarkerOptions()
                             .position(austinLatLong)
                             .title("Austin, Texas")
-                            .snippet("Home of the Tacos"));
+                            .snippet("Home of Alamo Drafthouse"));
 
                     LatLngBounds bounds = new LatLngBounds.Builder()
                             .include(venueLatLong)
                             .include(austinLatLong)
                             .build();
 
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 250));
+//                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 250));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, padding));
                 } else { // the list of venues
 
                     LatLngBounds.Builder builder = new LatLngBounds.Builder();
@@ -127,7 +157,8 @@ public class MapsActivity extends FragmentActivity
                         venuesList.get(i).setMarker(marker);
                     }
                     LatLngBounds bounds = builder.build();
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, padding));
+//                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
                 }
                 marker.showInfoWindow();
 
