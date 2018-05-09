@@ -7,6 +7,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -64,6 +65,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         // Setup the toolbar UI elements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Searching...");
+        // CDA FIX - ADD Twirling wait progress indicator
         toolbar.setNavigationIcon(android.support.design.R.drawable.abc_ic_ab_back_material);
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -79,11 +81,12 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
 
-                if(frsResults == null)
+                if(frsResults == null) {
+                        Snackbar.make(view, "One moment... data is loading", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
                     return;
+                }
 
                 // Creates an intent to direct the user to a multi-venue map view
                 Context context = getApplicationContext();
@@ -96,24 +99,18 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                                                 frsResults.get(n).venue.id,
                                                 frsResults.get(n).venue.categories.get(0).name,
                                                 frsResults.get(n).venue.location.lat,
-                                                frsResults.get(n).venue.location.lng
-                                                ,
+                                                frsResults.get(n).venue.location.lng,
                                                 frsResults.get(n).venue.categories.get(0).icon.prefix
-                                              + "32" // CDA FIX - MAke constant FOURSQUARE_ICON_SIZE
-                                              + frsResults.get(n).venue.categories.get(0).icon.suffix
+                                              + "bg_88" // CDA FIX - Make constant FOURSQUARE_ICON_SIZE
+                                              + frsResults.get(n).venue.categories.get(0).icon.suffix,
+                                      "https://foursquare.com/v/"+frsResults.get(n).venue.id
                     ) );
                 }
-
                 // Passes the crucial venue details onto the map view
-//                i.putExtra("name", frsResults.get(0).venue.name);
-//                i.putExtra("ID", frsResults.get(0).venue.id);
-//                i.putExtra("latitude", frsResults.get(0).venue.location.lat);
-//                i.putExtra("longitude", frsResults.get(0).venue.location.lng);
                 i.putExtra("venuesList", venueResults);
 
                 // Transitions to the map view.
                 context.startActivity(i);
-
             }
         });
 
@@ -125,7 +122,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
         // The visible TextView and RecyclerView objects
 //        snapToPlace = (TextView)findViewById(R.id.snapToPlace);
-        placePicker = (RecyclerView)findViewById(R.id.coffeeList); // CDA FIX change name
+        placePicker = (RecyclerView)findViewById(R.id.placePickerList); // CDA FIX change name
 
         // Sets the dimensions, LayoutManager, and dividers for the RecyclerView
         placePicker.setHasFixedSize(true);
@@ -156,7 +153,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
             if (mLastLocation != null) {
 
-                Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+                Toolbar toolbar = findViewById(R.id.toolbar);
                 toolbar.setTitle("Search: " + searchString);
 //                setSupportActionBar(toolbar);
 //                snapToPlace.setText("Here's some "+ searchString +" nearby in Austin, TX");
@@ -194,12 +191,12 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
                     @Override
                     public void onFailure(Call<FoursquareJSON> call, Throwable t) {
-                        Toast.makeText(getApplicationContext(), "Mr. Jitters can't connect to Foursquare's servers!", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), "Can't connect to Foursquare's servers!", Toast.LENGTH_LONG).show();
                         finish();
                     }
                 });
             } else {
-                Toast.makeText(getApplicationContext(), "Mr. Jitters can't determine your current location!", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Can't determine your current location!", Toast.LENGTH_LONG).show();
                 finish();
             }
         }
@@ -226,7 +223,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        Toast.makeText(getApplicationContext(), "Mr. Jitters can't connect to Google's servers!", Toast.LENGTH_LONG).show();
+        Toast.makeText(getApplicationContext(), "Can't connect to Google's servers!", Toast.LENGTH_LONG).show();
         finish();
     }
 

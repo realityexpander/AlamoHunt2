@@ -16,30 +16,43 @@ public class Venue implements Serializable {
     private Double longitude;
     private Marker marker;
     private String categoryIconURL;
+    private String venueURL;
+    private String distanceToAustin;
 
+    public Venue() {
+        this("","","");
+    }
 
-    public Venue(String name, String id, String categoryName){
+    public Venue(String name,
+                 String id,
+                 String categoryName){
         this.setName(name);
         this.setId(id);
         this.setCategoryName(categoryName);
     }
 
-    public Venue(String name, String id, String categoryName, Double latitude, Double longitude){
-        this.setName(name);
-        this.setId(id);
-        this.setCategoryName(categoryName);
+    public Venue(String name,
+                 String id,
+                 String categoryName,
+                 Double latitude,
+                 Double longitude){
+        this(name, id, categoryName);
         this.setLatitude(latitude);
         this.setLongitude(longitude);
     }
 
-    public Venue(String name, String id, String categoryName, Double latitude, Double longitude, String categoryIconURL){
-        this.setName(name);
-        this.setId(id);
-        this.setCategoryName(categoryName);
-        this.setLatitude(latitude);
-        this.setLongitude(longitude);
+    public Venue(String name,
+                 String id,
+                 String categoryName,
+                 Double latitude,
+                 Double longitude,
+                 String categoryIconURL,
+                 String venueURL){
+        this(name, id, categoryName, latitude, longitude);
         this.setCategoryIconURL(categoryIconURL);
+        this.setVenueURL(venueURL);
     }
+
 
     public String getName() {
         return name;
@@ -56,6 +69,7 @@ public class Venue implements Serializable {
     public String getCategoryIconURL() {
         return categoryIconURL;
     }
+    public String getVenueURL() {return venueURL;}
 
 
     public void setName(String name) {
@@ -77,6 +91,7 @@ public class Venue implements Serializable {
     public void setCategoryIconURL(String categoryIconURL) {
         this.categoryIconURL = categoryIconURL;
     }
+    public void setVenueURL(String venueURL) {this.venueURL = venueURL;}
 
 }
 

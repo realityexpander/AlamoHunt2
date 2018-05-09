@@ -11,8 +11,7 @@ android:layout_height="match_parent">
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        android:visibility="visible"
-        app:expanded="true">
+        android:visibility="visible">
 
         <android.support.design.widget.CollapsingToolbarLayout
             android:id="@+id/collapsing_toolbar"
@@ -70,6 +69,7 @@ android:layout_height="match_parent">
         android:src="@android:drawable/btn_star_big_on" />
 
     <android.support.v4.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="449dp"
         android:fillViewport="true"
@@ -83,13 +83,40 @@ android:layout_height="match_parent">
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/tvCategoryName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentStart="true"
-                android:layout_marginBottom="177dp"
+                android:layout_marginBottom="10dp"
                 android:layout_marginStart="50dp"
                 android:text="Banking"
+                android:textStyle="bold"
+                tools:textColor="@color/cast_expanded_controller_background_color" />
+
+            <ImageView
+                android:id="@+id/ivCategoryIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="50dp"
+                android:layout_marginBottom="10dp"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/mr_user_route_category_name"
+                android:visibility="visible"
+                app:srcCompat="@drawable/cast_ic_notification_stop_live_stream" />
+
+            <TextView
+                android:id="@+id/tvFoursquareWebsite"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginBottom="10dp"
+                android:layout_marginStart="50dp"
+                android:autoLink="web"
+                android:text="http://foursquare.com"
                 android:textStyle="bold"
                 tools:textColor="@color/cast_expanded_controller_background_color" />
 
@@ -97,20 +124,14 @@ android:layout_height="match_parent">
 
     </android.support.v4.widget.NestedScrollView>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="514dp"
-        app:layout_anchor="@id/collapsing_toolbar"
-        app:layout_anchorGravity="top|left">
-
-    </RelativeLayout>
-
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/multiVenueMap"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:visibility="invisible"
+        app:layout_anchor="@+id/multiVenueMap"
+        app:layout_anchorGravity="left|bottom">
 
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
