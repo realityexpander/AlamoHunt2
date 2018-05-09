@@ -22,6 +22,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.ViewHolder> {
@@ -40,10 +41,14 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
         TextView rating;
         TextView distance;
         ImageView ivCategoryIcon;
+
+        // Venue fields internal
         String id;
         double latitude;
         double longitude;
         String categoryIconURL;
+
+        Venue  venueDetails = new Venue("","","");
 
         public ViewHolder(View v) {
             super(v);
@@ -65,11 +70,23 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
              Intent i = new Intent(context, MapsActivity.class);
 
             // Passes the crucial venue details onto the map view
-            i.putExtra("name", name.getText());
-            i.putExtra("ID", id);
-            i.putExtra("latitude", latitude);
-            i.putExtra("longitude", longitude);
-            i.putExtra("categoryIconURL", categoryIconURL);
+//            i.putExtra("name", name.getText());
+//            i.putExtra("ID", id);
+//            i.putExtra("latitude", latitude);
+//            i.putExtra("longitude", longitude);
+//            i.putExtra("categoryIconURL", categoryIconURL);
+
+            // Build the one-item venue list
+            ArrayList<Venue> venueResults = new ArrayList<>();
+            venueResults.add(new Venue(
+                        venueDetails.getName(),
+                        venueDetails.getId(),
+                        venueDetails.getCategoryName(),
+                        venueDetails.getLatitude(),
+                        venueDetails.getLongitude(),
+                        venueDetails.getCategoryIconURL() ));
+            // Passes the crucial venue details onto the map view
+            i.putExtra("venuesList", venueResults);
 
             // Transitions to the map view.
             context.startActivity(i);
@@ -92,6 +109,8 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
 
         // Sets each view with the appropriate venue details
         holder.name.setText(results.get(position).venue.name);
+        holder.venueDetails.setName(results.get(position).venue.name);
+
 //        holder.address.setText(frsResults.get(position).venue.location.address);
         holder.address.setText(results.get(position).venue.categories.get(0).name);
 //        holder.distance.setText(Integer.toString(frsResults.get(position).venue.location.distance) + "m");
@@ -130,19 +149,22 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
 
 
         // Stores additional venue details for the map view
-        holder.id = results.get(position).venue.id;
-        holder.latitude = results.get(position).venue.location.lat;
-        holder.longitude = results.get(position).venue.location.lng;
+        //holder.id = results.get(position).venue.id;
+        holder.venueDetails.setId(results.get(position).venue.id);
+//        holder.latitude = results.get(position).venue.location.lat;
+        holder.venueDetails.setLatitude(results.get(position).venue.location.lat);
+//        holder.longitude = results.get(position).venue.location.lng;
+        holder.venueDetails.setLongitude(results.get(position).venue.location.lng);
+        holder.venueDetails.setCategoryName(results.get(position).venue.categories.get(0).name);
+        // Load the category icon
+        holder.venueDetails.setCategoryIconURL(
+                results.get(position).venue.categories.get(0).icon.prefix + "bg_88"
+              + results.get(position).venue.categories.get(0).icon.suffix );
 
-        // Load the category icon  CDA FIX
-       holder.categoryIconURL = results.get(position).venue.categories.get(0).icon.prefix + "bg_88" +
-                results.get(position).venue.categories.get(0).icon.suffix;
-        // Picasso.with(context).load(holder.categoryIconURL).into(holder.ivCategoryIcon);
         Picasso.with(context)
-                .load(holder.categoryIconURL)
+                .load(holder.venueDetails.getCategoryIconURL())
                 .resize(95, 95)
                 .into(holder.ivCategoryIcon);
-
     }
 
     @Override
