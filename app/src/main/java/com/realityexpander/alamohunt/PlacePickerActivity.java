@@ -14,6 +14,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -122,7 +123,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
         // The visible TextView and RecyclerView objects
 //        snapToPlace = (TextView)findViewById(R.id.snapToPlace);
-        placePicker = (RecyclerView)findViewById(R.id.placePickerList); // CDA FIX change name
+        placePicker = (RecyclerView)findViewById(R.id.placePickerList);
 
         // Sets the dimensions, LayoutManager, and dividers for the RecyclerView
         placePicker.setHasFixedSize(true);
@@ -158,12 +159,14 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 //                setSupportActionBar(toolbar);
 //                snapToPlace.setText("Here's some "+ searchString +" nearby in Austin, TX");
 
+                // ***
+                // Find venues matching the search criteria
                 // Builds Retrofit and FoursquareService objects for calling the Foursquare API and parsing with GSON
                 Retrofit retrofit = new Retrofit.Builder()
                         .baseUrl(foursquareBaseURL)
                         .addConverterFactory(GsonConverterFactory.create())
                         .build();
-                FoursquareService foursquare = retrofit.create(FoursquareService.class);
+                final FoursquareService foursquare = retrofit.create(FoursquareService.class);
 
                 // Calls the Foursquare API to explore nearby places
                 Call<FoursquareJSON> searchCall = foursquare.searchForPlace(
@@ -180,13 +183,69 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                         FoursquareJSON fjson = response.body();
                         FoursquareResponse fr = fjson.response;
                         FoursquareGroup fg = fr.group;
-                        List<FoursquareResults> frs = fg.results;
+                        final List<FoursquareResults> frs = fg.results;
 
                         // Displays the frsResults in the RecyclerView
                         placePickerAdapter = new PlacePickerAdapter(getApplicationContext(), frs);
                         placePicker.setAdapter(placePickerAdapter);
 
                         frsResults = frs;
+
+                        // ***
+                        // Go thru each of the venues and get the ratings with another call to /venues/VENUE_ID
+                        // for venues[i], Get the rating & rating color.
+                        // Fill in frs.rating with the rating from /venues/VENUE_ID endpoint
+                        for( int i=0; i < frs.size(); i++) {
+
+                            try {
+                                // Calls the Foursquare API to get venue details
+                                Call<FoursquareJSON> searchCall2 = foursquare.searchVenueID(
+                                        frs.get(i).venue.id,
+                                        foursquareClientID,
+                                        foursquareClientSecret
+                                );
+                                searchCall2.enqueue(new Callback<FoursquareJSON>() {
+                                    @Override
+                                    public void onResponse(Call<FoursquareJSON> call, Response<FoursquareJSON> response) {
+
+                                        // Gets the single venue object from the JSON response
+                                        FoursquareJSON fjson2 = response.body();
+                                        FoursquareResponse fr = fjson2.response;
+                                        FoursquareVenue fv = fr.venue;
+
+                                        // Get the rating and rating text color from current call & update the frs variable & PickerListAdapter
+                                        if (fv.ratingColor != null) {
+                                            // search the list for the matching ID
+                                            for(int n=0; n<frs.size(); n++) {
+                                                if (frs.get(n).venue.id.equals( fv.id)
+                                                        &&  frs.get(n).venue.rating != fv.rating)  { // if its already set, no need to update the Recyclerview
+                                                    frs.get(n).venue.rating = fv.rating;
+                                                    if (fv.ratingColor != null)
+                                                        frs.get(n).venue.ratingColor = fv.ratingColor;
+
+                                                    // Displays the frsResults in the RecyclerView
+                                                    placePickerAdapter = new PlacePickerAdapter(getApplicationContext(), frs);
+                                                    placePicker.setAdapter(placePickerAdapter);
+                                                    frsResults = frs;
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<FoursquareJSON> call, Throwable t) {
+                                        Toast.makeText(getApplicationContext(), "Can't connect to Foursquare's servers!", Toast.LENGTH_LONG).show();
+                                        finish();
+                                    }
+                                });
+
+                            } catch (Exception e) {
+                                Log.d("HUS", "EXCEPTION " + e);
+                                Toast.makeText(getApplicationContext(), "Can't connect to Foursquare's servers!", Toast.LENGTH_LONG).show();
+                                finish();
+                            }
+                        }
+
                     }
 
                     @Override

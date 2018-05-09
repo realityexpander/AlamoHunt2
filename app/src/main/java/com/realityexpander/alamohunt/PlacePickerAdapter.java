@@ -19,18 +19,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.ViewHolder> {
 
@@ -103,18 +96,20 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
 
+        FoursquareVenue fv = results.get(position).venue;
+
         // Sets each view with the appropriate venue details
-        holder.name.setText(results.get(position).venue.name);
-        holder.address.setText(results.get(position).venue.categories.get(0).name); // CDA FIX Change .address to .category
+        holder.name.setText(fv.name);
+        holder.address.setText(fv.categories.get(0).name); // CDA FIX Change .address to .category
 
         // Calc distance to center of Austin, TX (30.2672° N, 97.7431° W)
         Location locationAustinCenter = new Location("Austin, TX");
         locationAustinCenter.setLatitude(30.2672); // CDA FIX put into strings
         locationAustinCenter.setLongitude(-97.7431);
 
-        Location locationVenue = new Location(results.get(position).venue.name);
-        locationVenue.setLatitude(results.get(position).venue.location.lat);
-        locationVenue.setLongitude(results.get(position).venue.location.lng);
+        Location locationVenue = new Location(fv.name);
+        locationVenue.setLatitude(fv.location.lat);
+        locationVenue.setLongitude(fv.location.lng);
         int distance = (int) locationAustinCenter.distanceTo(locationVenue);
         holder.distance.setText(Integer.toString(distance) + "m");
 
@@ -141,16 +136,16 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
 
 
         // Stores item venue detail fields for the map view from the foursquare results // CDA FIX Do this here?
-        holder.venueDetails.setName(results.get(position).venue.name);
-        holder.venueDetails.setId(results.get(position).venue.id);
-        holder.venueDetails.setLatitude(results.get(position).venue.location.lat);
-        holder.venueDetails.setLongitude(results.get(position).venue.location.lng);
-        holder.venueDetails.setCategoryName(results.get(position).venue.categories.get(0).name);
+        holder.venueDetails.setName(fv.name);
+        holder.venueDetails.setId(fv.id);
+        holder.venueDetails.setLatitude(fv.location.lat);
+        holder.venueDetails.setLongitude(fv.location.lng);
+        holder.venueDetails.setCategoryName(fv.categories.get(0).name);
         // Load the category icon
         holder.venueDetails.setCategoryIconURL(
-                results.get(position).venue.categories.get(0).icon.prefix + "bg_88"
-              + results.get(position).venue.categories.get(0).icon.suffix );
-        holder.venueDetails.setVenueURL("https://foursquare.com/v/"+results.get(position).venue.id);
+                fv.categories.get(0).icon.prefix + "bg_88"
+              + fv.categories.get(0).icon.suffix );
+        holder.venueDetails.setVenueURL("https://foursquare.com/v/"+fv.id);
 
         Picasso.with(context)
                 .load(holder.venueDetails.getCategoryIconURL())
@@ -160,50 +155,55 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
 
         // *** Get the rating
         // The base URL for the Foursquare API
-        String foursquareBaseURL = "https://api.foursquare.com/v2/";
-
-        // The client ID and client secret for authenticating with the Foursquare API
-        String foursquareClientID;
-        String foursquareClientSecret;
-
-        // Get details for the venueID
-        // Builds Retrofit and FoursquareService objects for calling the Foursquare API and parsing with GSON
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(foursquareBaseURL)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-        FoursquareService foursquare = retrofit.create(FoursquareService.class);
-
-        // Gets the stored Foursquare API client ID and client secret from XML
-        foursquareClientID = context.getResources().getString(R.string.foursquare_client_id);
-        foursquareClientSecret = context.getResources().getString(R.string.foursquare_client_secret);
-
-        // Calls the Foursquare API to get venue details
-        Call<FoursquareJSON> searchCall = foursquare.searchVenueID(
-                holder.venueDetails.getId(),
-                foursquareClientID,
-                foursquareClientSecret
-        );
-        searchCall.enqueue(new Callback<FoursquareJSON>() {
-            @Override
-            public void onResponse(Call<FoursquareJSON> call, Response<FoursquareJSON> response) {
-
-                // Gets the venue object from the JSON response
-                FoursquareJSON fjson = response.body();
-                FoursquareResponse fr = fjson.response;
-                FoursquareVenue fv = fr.venue;
+//        String foursquareBaseURL = "https://api.foursquare.com/v2/";
+//
+//        // The client ID and client secret for authenticating with the Foursquare API
+//        String foursquareClientID;
+//        String foursquareClientSecret;
+//
+//        // Get details for the venueID
+//        // Builds Retrofit and FoursquareService objects for calling the Foursquare API and parsing with GSON
+//        Retrofit retrofit = new Retrofit.Builder()
+//                .baseUrl(foursquareBaseURL)
+//                .addConverterFactory(GsonConverterFactory.create())
+//                .build();
+//        FoursquareService foursquare = retrofit.create(FoursquareService.class);
+//
+//        // Gets the stored Foursquare API client ID and client secret from XML
+//        foursquareClientID = context.getResources().getString(R.string.foursquare_client_id);
+//        foursquareClientSecret = context.getResources().getString(R.string.foursquare_client_secret);
+//
+//        // Calls the Foursquare API to get venue details
+//        Call<FoursquareJSON> searchCall = foursquare.searchVenueID(
+//                holder.venueDetails.getId(),
+//                foursquareClientID,
+//                foursquareClientSecret
+//        );
+//        searchCall.enqueue(new Callback<FoursquareJSON>() {
+//            @Override
+//            public void onResponse(Call<FoursquareJSON> call, Response<FoursquareJSON> response) {
+//
+//                // Gets the venue object from the JSON response
+//                FoursquareJSON fjson = response.body();
+//                FoursquareResponse fr = fjson.response;
+//                FoursquareVenue fv = results.get(position).venue;
 
                 // Set the rating and text color
-                holder.rating.setText(Double.toString(fv.rating));
-                holder.rating.setBackgroundColor(Color.parseColor("#"+fv.ratingColor));
-            }
+                if( fv.rating > 0) {
+                    holder.rating.setVisibility(View.VISIBLE);
+                    holder.rating.setText(Double.toString(fv.rating));
+                    if (fv.ratingColor != null)
+                        holder.rating.setBackgroundColor(Color.parseColor("#" + fv.ratingColor));
+                } else
+                    holder.rating.setVisibility(View.INVISIBLE);
+ //           }
 
-            @Override
-            public void onFailure(Call<FoursquareJSON> call, Throwable t) {
-                Toast.makeText(context, "Can't connect to Foursquare's servers!", Toast.LENGTH_LONG).show();
-                //finish();
-            }
-        });
+//            @Override
+//            public void onFailure(Call<FoursquareJSON> call, Throwable t) {
+//                Toast.makeText(context, "Can't connect to Foursquare's servers!", Toast.LENGTH_LONG).show();
+//                //finish();
+//            }
+//        });
 
 
 
