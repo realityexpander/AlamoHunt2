@@ -7,7 +7,9 @@
 
 package com.realityexpander.alamohunt;
 
-public class FoursquareResults {
+import java.io.Serializable;
+
+public class FoursquareResults implements Serializable{
 
     // A venue object within the frsResults.
     FoursquareVenue venue;

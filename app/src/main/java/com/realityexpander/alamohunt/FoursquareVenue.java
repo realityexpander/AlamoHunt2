@@ -7,10 +7,11 @@
 
 package com.realityexpander.alamohunt;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FoursquareVenue {
+public class FoursquareVenue implements Serializable {
 
     // The ID of the venue.
     String id;
