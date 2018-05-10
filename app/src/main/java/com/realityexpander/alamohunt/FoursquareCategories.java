@@ -1,9 +1,16 @@
+/**
+ * Filename: FoursquareCategories.java
+ * Author: Chris Athanas
+ *
+ * FoursquareCategories describes Categories of the venue within a given venue from the Foursquare API.
+ */
+
 package com.realityexpander.alamohunt;
 
 import java.io.Serializable;
 
 /**
- * Created by CDA on 5/2/18.
+ *
  */
 
 public class FoursquareCategories implements Serializable {

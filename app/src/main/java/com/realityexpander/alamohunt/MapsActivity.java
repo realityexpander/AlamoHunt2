@@ -3,8 +3,8 @@
  * Author: Chris Athanas
  * Based on Mr. Jitters Foursquare sample app
  *
- * MapActivity represents a map view of a specific venue from PlacePickerActivity.  This activity will
- * allow a user to link back to the Foursquare venue page.
+ * MapActivity represents a map view of either a specific venue or a list of venues
+ * from PlacePickerActivity.  This activity will allow a user click into the ViewVenueActivity.
  */
 
 package com.realityexpander.alamohunt;
@@ -58,11 +58,6 @@ public class MapsActivity extends AppCompatActivity
     private GoogleMap mMap;
 
     // The details of the venue that is being displayed.
-    private String venueID;
-    private String venueName;
-    private double venueLatitude;
-    private double venueLongitude;
-
     private ArrayList<Venue> venuesList;
     private Marker markerAustin;
 

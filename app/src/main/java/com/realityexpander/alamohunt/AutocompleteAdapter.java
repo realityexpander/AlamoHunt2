@@ -1,5 +1,13 @@
-package com.realityexpander.alamohunt;
+/**
+ * Filename: AutocompleteAdapter.java
+ * Author: Chris Athanas
+ *
+ * AutocompleteAdapter represents the adapter for attaching venue data to the ArrayAdapter within
+ * MainActivity.  This adapter will handle a list of suggested venues from FoursquareResults and parse them
+ * into the view.
+ */
 
+package com.realityexpander.alamohunt;
 
 import android.content.Context;
 import android.util.Log;
@@ -29,10 +37,10 @@ public class AutocompleteAdapter extends ArrayAdapter<Venue> {
 
     // RETROFIT
     // The base URL for the Foursquare API
-    private String foursquareBaseURL = "";
+    private String foursquareBaseURL;
     // The client ID and client secret for authenticating with the Foursquare API
-    private String foursquareClientID = "";
-    private String foursquareClientSecret = "";
+    private String foursquareClientID;
+    private String foursquareClientSecret;
 
     public AutocompleteAdapter(Context context, int resource) {
         super(context, resource);
@@ -67,7 +75,7 @@ public class AutocompleteAdapter extends ArrayAdapter<Venue> {
                     String term = constraint.toString();
                     mVenues.clear();
                     try {
-                        //get suggestions from the foursquare api
+                        //get suggestions from the foursquare api (Done Async here)
                         mVenues = findVenues(term);
                     } catch (Exception e) {
                         Log.d("CDA", "EXCEPTION " + e);

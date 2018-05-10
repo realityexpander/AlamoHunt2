@@ -1,13 +1,16 @@
+/**
+ * Filename: CustomBackAutoCompleteTextView.java
+ * Author: Chris Athanas
+ *
+ * This captures the back button so the keyboard will hide first and not the list of recommended venues.
+ */
+
 package com.realityexpander.alamohunt;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.inputmethod.InputMethodManager;
-
-/**
- * Created by CDA on 5/3/18.
- */
 
     // This allows for the custom back button behavior
     // Drops the soft keyboard in order to see the AutoCompleteTextView drop-down
