@@ -1,5 +1,4 @@
 # AlamoHunt2
-initial commit
 
 This app searches for places and recommendations using Foursquare's places API for Austin venues of 
 interest, such as Tacos. Displays ratings for each venue, distance from the center of Austin and
