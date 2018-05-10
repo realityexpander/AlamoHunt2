@@ -10,15 +10,18 @@
 package com.realityexpander.alamohunt;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -32,8 +35,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.squareup.picasso.Picasso;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import retrofit2.Call;
@@ -70,6 +76,9 @@ public class MapsActivity extends AppCompatActivity
     private String foursquareClientID;
     private String foursquareClientSecret;
 
+    ArrayList<String> favoriteVenueIDs;
+    boolean favorited;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,23 +93,65 @@ public class MapsActivity extends AppCompatActivity
             mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map);
 
+            // **** HIDE
             // Hide the multi venue map view
             LinearLayout ll = findViewById(R.id.multiVenueMap);
             ll.setVisibility(GONE);
 
+
+            // *** FILL IN
             // Fill in data field views for Single venue details
+            final Venue cv = venuesList.get(0); // current venue
             ImageView ivCategoryIcon = (ImageView) findViewById(R.id.ivCategoryIcon);
-            Picasso.with(getApplicationContext()).load(venuesList.get(0).getCategoryIconURL()).into(ivCategoryIcon);
+            Picasso.with(getApplicationContext()).load(cv.getCategoryIconURL()).into(ivCategoryIcon);
 
             TextView tvCategoryName = (TextView) findViewById(R.id.tvCategoryName);
-            tvCategoryName.setText(venuesList.get(0).getCategoryName());
+            tvCategoryName.setText(cv.getCategoryName());
 
             final TextView tvVenueURL = (TextView) findViewById(R.id.tvFoursquareWebsite);
-            tvVenueURL.setText(venuesList.get(0).getVenueURL());
+            tvVenueURL.setText(cv.getVenueURL());
 
             setTitle(venuesList.get(0).getName());
 
+            favoriteVenueIDs = LoadPrefs("favoriteVenueIDs");
+            if (favoriteVenueIDs == null)
+                favoriteVenueIDs = new ArrayList<>();
+            // The FAB favorites the venue true/false
+            final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+            fab.setImageResource(android.R.drawable.star_big_off); // default to off
+            // Set the favorite status on the button
+            if ( favoriteVenueIDs != null) {
+                for (int i = 0; i < favoriteVenueIDs.size(); i++)
+                    if (favoriteVenueIDs.get(i).equals(cv.getId())) {
+                        favorited = true;
+                        fab.setImageResource(android.R.drawable.star_big_on);
+                    }
+            }
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // Toggle the favorites
+                    if (!favorited) {
+                        // toggle the button image to favorited
+                        fab.setImageResource(android.R.drawable.star_big_on);
+                        favorited = true;
+                        favoriteVenueIDs.add(cv.getId());
+                        SavePrefs(favoriteVenueIDs, "favoriteVenueIDs");
+                    } else {
+                        // toggle the button image
+                        fab.setImageResource(android.R.drawable.star_big_off);
+                        favorited = false;
+                        for (int i = 0; i < favoriteVenueIDs.size(); i++)
+                            if (cv.getId().equals(favoriteVenueIDs.get(i)))
+                                favoriteVenueIDs.remove(i);
 
+                        SavePrefs(favoriteVenueIDs, "favoriteVenueIDs");
+                    }
+                }
+            });
+
+
+            // *** GET VENUE DETAILS
             // Get details for the venueID
             // Builds Retrofit and FoursquareService objects for calling the Foursquare API and parsing with GSON
             Retrofit retrofit = new Retrofit.Builder()
@@ -139,9 +190,6 @@ public class MapsActivity extends AppCompatActivity
             });
 
 
-
-
-
         } else { // Show multi venue screen
             mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map2);
@@ -161,6 +209,23 @@ public class MapsActivity extends AppCompatActivity
         mapFragment.getMapAsync(this);
 
 
+    }
+
+    public void SavePrefs( ArrayList<String> list, String key) {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(list);
+        editor.putString(key, json);
+        editor.apply();
+    }
+
+    public ArrayList<String> LoadPrefs( String key ) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        Gson gson = new Gson();
+        String json = prefs.getString(key, null);
+        Type type = new TypeToken<ArrayList<String>>() {}.getType();
+        return gson.fromJson(json, type);
     }
 
     @Override
