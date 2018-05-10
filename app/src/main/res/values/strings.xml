@@ -3,8 +3,9 @@
     <string name="title_activity_place_picker">PlacePickerActivity</string>
     <string name="google_maps_key" templateMergeStrategy="preserve" translatable="false">
     AIzaSyBuWnjm2xsMd6lNwIrOgcMAWpQcPviODk0</string>
-    <string name="foursquare_client_id">EJ4OHQG0B4ULZARQUVBQQSFAZN5JKVIJUZXRG05HTAMSVLIK</string>
-    <string name="foursquare_client_secret">FF5FTEFKICTIZQE50TXHOQAK3AMOQTOCPVCXRY0TKEV0WKJ4</string>
+    <string name="foursquare_client_id">RHC4PG23A5ICWD4HT1VGW21MVBZEW42LXP34EE4P1HGBKUVN</string>
+    <string name="foursquare_client_secret">SAE30GFO1QPOVUMHLH0UVGFA2RGZWC0GSSEFW1OBMP1VG4QA</string>
     <string name="foursquare_base_URL">"https://api.foursquare.com/v2/"</string>
+    <string name="title_activity_view_venue">ViewVenueActivity</string>
 
 </resources>

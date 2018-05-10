@@ -21,9 +21,14 @@ public class FoursquareVenue {
     // The rating of the venue, if available.
     double rating;
 
+    // Color for the rating
+    String ratingColor;
+
     // A location object within the venue.
     FoursquareLocation location;
 
     List<FoursquareCategories> categories = new ArrayList<FoursquareCategories>();
+
+
 
 }

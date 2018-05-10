@@ -1,7 +1,7 @@
 package com.realityexpander.alamohunt;
 
 /**
- * Created by test2 on 5/2/18.
+ * Created by CDA on 5/2/18.
  */
 
 public class FoursquareCategories {
@@ -15,4 +15,5 @@ public class FoursquareCategories {
     // The shortName of the category.
     String shortName;
 
+    FoursquareIcon icon;
 }

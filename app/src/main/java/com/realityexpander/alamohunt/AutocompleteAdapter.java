@@ -136,7 +136,7 @@ public class AutocompleteAdapter extends ArrayAdapter<Venue> {
                 theVenue = new Venue(frs.get(i).venue.name,
                                      frs.get(i).venue.id,
                                      frs.get(i).venue.categories.get(0).name
-                        );
+                );
 //                theVenue.setId(frs.get(i).venue.categories.get(i).id); // cda fix - add to categories not id
                 suggestList.add(theVenue);
             }

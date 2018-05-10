@@ -18,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void searchButtonClick(View view) {
         Intent i = new Intent(getApplicationContext(), PlacePickerActivity.class);
+//        Intent i = new Intent(getApplicationContext(), MapsActivity.class);
 
         String searchString = ((AutoCompleteTextView)findViewById(R.id.search)).getText().toString();
         i.putExtra( "_search", searchString );
