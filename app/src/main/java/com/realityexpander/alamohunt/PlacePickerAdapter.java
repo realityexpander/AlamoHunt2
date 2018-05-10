@@ -5,6 +5,8 @@
  * PlacePickerAdapter represents the adapter for attaching venue data to the RecyclerView within
  * PlacePickerActivity.  This adapter will handle a list of incoming FoursquareResults and parse them
  * into the view.
+ *
+ * - Uses Picasso to load images
  */
 
 package com.realityexpander.alamohunt;
@@ -34,6 +36,9 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
 
     // The application context for getting resources
     private Context context;
+
+    private static final double AUSTIN_TX_LATITUDE = 30.2672;
+    private static final double AUSTIN_TX_LONGITUDE = -97.7431;
 
     // The list of frsResults from the Foursquare API
     private List<FoursquareResults> results;
@@ -119,8 +124,8 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
 
         // Calc distance to center of Austin, TX (30.2672° N, 97.7431° W)
         Location locationAustinCenter = new Location("Austin, TX");
-        locationAustinCenter.setLatitude(30.2672); // CDA FIX put into strings
-        locationAustinCenter.setLongitude(-97.7431);
+        locationAustinCenter.setLatitude(AUSTIN_TX_LATITUDE);
+        locationAustinCenter.setLongitude(AUSTIN_TX_LONGITUDE);
 
         Location locationVenue = new Location(fv.name);
         locationVenue.setLatitude(fv.location.lat);
@@ -128,7 +133,7 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
         int distance = (int) locationAustinCenter.distanceTo(locationVenue);
         holder.distance.setText(Integer.toString(distance) + "m");
 
-        // Stores item venue detail fields for the map view from the foursquare results // CDA FIX refactor?
+        // Stores item venue detail fields for the map view from the foursquare results
         holder.venueDetails.setName(fv.name);
         holder.venueDetails.setId(fv.id);
         holder.venueDetails.setLatitude(fv.location.lat);
@@ -139,7 +144,7 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
         holder.venueDetails.setCategoryIconURL(
                 fv.categories.get(0).icon.prefix + "bg_88"
               + fv.categories.get(0).icon.suffix );
-        holder.venueDetails.setVenueURL("https://foursquare.com/v/"+fv.id); // CDA FIX refactor?
+        holder.venueDetails.setVenueURL("https://foursquare.com/v/"+fv.id); // CDA FIX refactor? do this calc in a func
 
         // Set favorited
         holder.ivFavorite.setVisibility(View.INVISIBLE); // defaults to invisible

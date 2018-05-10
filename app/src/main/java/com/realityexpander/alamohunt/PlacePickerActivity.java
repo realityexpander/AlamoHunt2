@@ -1,3 +1,15 @@
+/**
+ * Filename: PlacePickerActivity.java
+ * Author: Chris Athanas
+ *
+ * PlacePickerActivity represents a list view of venues of interest and a FAB
+ *
+ * - Shows basic venue information like category, rating, rating color, category icon,
+ *   distance from Austin city center.
+ * - If a click on a single venue, show the venue details.
+ * - If click FAB then show the map of all venues.
+ */
+
 package com.realityexpander.alamohunt;
 
 import android.content.Context;
@@ -51,7 +63,6 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
     // The base URL for the Foursquare API
     private String foursquareBaseURL = "https://api.foursquare.com/v2/";
-
     // The client ID and client secret for authenticating with the Foursquare API
     private String foursquareClientID;
     private String foursquareClientSecret;
