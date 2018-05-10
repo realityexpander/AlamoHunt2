@@ -65,11 +65,12 @@
         android:textSize="12sp" />
 
     <ImageView
-        android:id="@+id/placePicketCategoryIcon2"
+        android:id="@+id/placePickerFavorite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/placePickerItemName"
         android:layout_toEndOf="@+id/placePickerItemName"
+        android:visibility="invisible"
         app:srcCompat="@android:drawable/btn_star_big_on" />
 
 </RelativeLayout>
