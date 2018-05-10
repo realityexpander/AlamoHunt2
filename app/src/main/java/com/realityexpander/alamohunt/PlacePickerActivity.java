@@ -16,6 +16,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,8 +24,9 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -40,6 +42,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
     // The TextView for displaying the current location
     private TextView snapToPlace;
+    private ProgressBar spinner;
 
     // The RecyclerView and associated objects for displaying the nearby coffee spots
     private RecyclerView placePicker;
@@ -55,8 +58,10 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
     private String searchString;
 
     // The list of frsResults from the Foursquare API
-    List<FoursquareResults> frsResults;
+    private ArrayList<FoursquareResults> frsResults;
     private ArrayList<Venue> venueResults;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +71,6 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         // Setup the toolbar UI elements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Searching...");
-        // CDA FIX - ADD Twirling wait progress indicator
         toolbar.setNavigationIcon(android.support.design.R.drawable.abc_ic_ab_back_material);
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
@@ -76,6 +80,8 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 //                startActivity(new Intent(getApplicationContext(),MainActivity.class));
             }
         });
+
+        spinner = (ProgressBar)findViewById(R.id.progressBar1);
 
         // The FAB shows all the venues on a map
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -109,6 +115,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                 }
                 // Passes the crucial venue details onto the map view
                 i.putExtra("venuesList", venueResults);
+                i.putExtra("frsResults", frsResults); // pass in the full results too (to be passed back from maps) // CDA FIX?
 
                 // Transitions to the map view.
                 context.startActivity(i);
@@ -179,17 +186,31 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                     @Override
                     public void onResponse(Call<FoursquareJSON> call, Response<FoursquareJSON> response) {
 
+                        if(response.body() == null) {
+                            try {
+                                JSONObject jObjError = new JSONObject(response.errorBody().string());
+                                Toast.makeText(getApplicationContext(), ((JSONObject)jObjError
+                                                                        .get("meta"))
+                                                                        .getString("errorDetail"), Toast.LENGTH_LONG).show();
+                            } catch (Exception e) {
+                                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                            }
+                            finish();
+                            return;
+                        }
                         // Gets the venue object from the JSON response
                         FoursquareJSON fjson = response.body();
                         FoursquareResponse fr = fjson.response;
                         FoursquareGroup fg = fr.group;
-                        final List<FoursquareResults> frs = fg.results;
+                        final ArrayList<FoursquareResults> frs = (ArrayList<FoursquareResults>)fg.results;
 
                         // Displays the frsResults in the RecyclerView
                         placePickerAdapter = new PlacePickerAdapter(getApplicationContext(), frs);
                         placePicker.setAdapter(placePickerAdapter);
 
                         frsResults = frs;
+
+                        spinner.setVisibility(View.GONE);
 
                         // ***
                         // Go thru each of the venues and get the ratings with another call to /venues/VENUE_ID
@@ -208,16 +229,29 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                                     @Override
                                     public void onResponse(Call<FoursquareJSON> call, Response<FoursquareJSON> response) {
 
+                                        if(response.body() == null) {
+                                            try {
+                                                JSONObject jObjError = new JSONObject(response.errorBody().string());
+                                                Toast.makeText(getApplicationContext(), ((JSONObject)jObjError
+                                                        .get("meta"))
+                                                        .getString("errorDetail"), Toast.LENGTH_LONG).show();
+                                            } catch (Exception e) {
+                                                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                                            }
+                                            finish();
+                                            return;
+                                        }
+
                                         // Gets the single venue object from the JSON response
                                         FoursquareJSON fjson2 = response.body();
                                         FoursquareResponse fr = fjson2.response;
                                         FoursquareVenue fv = fr.venue;
 
-                                        // Get the rating and rating text color from current call & update the frs variable & PickerListAdapter
+                                        // Get the rating and rating text color from Venue Info call & update the frs variable & PickerListAdapter
                                         if (fv.ratingColor != null) {
                                             // search the list for the matching ID
                                             for(int n=0; n<frs.size(); n++) {
-                                                if (frs.get(n).venue.id.equals( fv.id)
+                                                if (frs.get(n).venue.id.equals(fv.id)
                                                         &&  frs.get(n).venue.rating != fv.rating)  { // if its already set, no need to update the Recyclerview
                                                     frs.get(n).venue.rating = fv.rating;
                                                     if (fv.ratingColor != null)

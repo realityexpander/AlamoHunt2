@@ -7,7 +7,9 @@
 
 package com.realityexpander.alamohunt;
 
-public class FoursquareLocation {
+import java.io.Serializable;
+
+public class FoursquareLocation implements Serializable {
 
     // The address of the location.
     String address;

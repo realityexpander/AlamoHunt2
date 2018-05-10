@@ -11,6 +11,8 @@ import android.widget.Filter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONObject;
+
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +26,6 @@ public class AutocompleteAdapter extends ArrayAdapter<Venue> {
     private ArrayList<Venue> mVenues;
     private Context mContext;
     private int mResource; // The custom arrayAdapter view for each suggested venue
-
 
     // RETROFIT
     // The base URL for the Foursquare API
@@ -42,6 +43,7 @@ public class AutocompleteAdapter extends ArrayAdapter<Venue> {
         foursquareClientID = mContext.getResources().getString(R.string.foursquare_client_id);
         foursquareClientSecret = mContext.getResources().getString(R.string.foursquare_client_secret);
         foursquareBaseURL = mContext.getResources().getString(R.string.foursquare_base_URL);
+
     }
 
     @Override
@@ -59,6 +61,7 @@ public class AutocompleteAdapter extends ArrayAdapter<Venue> {
         Filter myFilter = new Filter() {
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
+
                 FilterResults filterResults = new FilterResults();
                 if (constraint != null) {
                     String term = constraint.toString();
@@ -126,6 +129,18 @@ public class AutocompleteAdapter extends ArrayAdapter<Venue> {
 
             // Gets the venue objects from the JSON response
             FoursquareJSON fjson = response.body();
+
+            if(response.body() == null) {
+                try {
+                    JSONObject jObjError = new JSONObject(response.errorBody().string());
+
+                    Toast.makeText(mContext, ((JSONObject)jObjError.get("meta")).getString("errorDetail"), Toast.LENGTH_LONG).show();
+                } catch (Exception e) {
+                    Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_LONG).show();
+                }
+                return null;
+            }
+
             FoursquareResponse fr = fjson.response;
             FoursquareGroup fg = fr.group;
             List<FoursquareResults> frs = fg.results;
@@ -137,14 +152,13 @@ public class AutocompleteAdapter extends ArrayAdapter<Venue> {
                                      frs.get(i).venue.id,
                                      frs.get(i).venue.categories.get(0).name
                 );
-//                theVenue.setId(frs.get(i).venue.categories.get(i).id); // cda fix - add to categories not id
                 suggestList.add(theVenue);
             }
 
 
         } catch (Exception e) {
             Log.d("HUS", "EXCEPTION " + e);
-            Toast.makeText(mContext, "Mr. Jitters can't connect to Foursquare's servers!", Toast.LENGTH_LONG).show();
+            Toast.makeText(mContext, "Can't connect to Foursquare's servers!", Toast.LENGTH_LONG).show();
             return null;
         }
 

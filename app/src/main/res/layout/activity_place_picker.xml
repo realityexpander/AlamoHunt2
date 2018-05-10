@@ -47,6 +47,15 @@
         android:clipToPadding="false">
     </android.support.v7.widget.RecyclerView>
 
+    <ProgressBar
+        android:id="@+id/progressBar1"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        app:layout_anchor="@id/placePickerList"
+        app:layout_anchorGravity="center_vertical|center_horizontal" />
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
         android:layout_width="wrap_content"

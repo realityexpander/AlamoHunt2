@@ -1,6 +1,6 @@
 /**
  * Filename: PlacePickerAdapter.java
- * Author: Matthew Huie
+ * Author: Chris Athanas
  *
  * PlacePickerAdapter represents the adapter for attaching venue data to the RecyclerView within
  * PlacePickerActivity.  This adapter will handle a list of incoming FoursquareResults and parse them
@@ -41,19 +41,18 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
     // Favorite venue ID's from shared preferences
     ArrayList<String> favoriteVenueIDs;
 
-
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         // The venue fields to display
         TextView name;
-        TextView address;
+        TextView category;
         TextView rating;
         TextView distance;
         ImageView ivCategoryIcon;
         ImageView ivFavorite;
 
         // Venue internal data
-        Venue  venueDetails = new Venue("","","");
+        Venue  venueDetails = new Venue();
 
         public ViewHolder(View v) {
             super(v);
@@ -61,7 +60,7 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
 
             // Gets the appropriate view for each venue detail
             name = (TextView)v.findViewById(R.id.placePickerItemName);
-            address = (TextView)v.findViewById(R.id.placePickerItemAddress);
+            category = (TextView)v.findViewById(R.id.placePickerItemAddress);
             rating = (TextView)v.findViewById(R.id.placePickerItemRating);
             distance = (TextView)v.findViewById(R.id.placePickerItemDistance);
             ivCategoryIcon = (ImageView)v.findViewById(R.id.placePickerCategoryIcon);
@@ -115,7 +114,8 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
 
         // Sets each view with the appropriate venue details
         holder.name.setText(fv.name);
-        holder.address.setText(fv.categories.get(0).name); // CDA FIX Change .address to .category
+        if (fv.categories.get(0) != null )
+            holder.category.setText(fv.categories.get(0).name);
 
         // Calc distance to center of Austin, TX (30.2672° N, 97.7431° W)
         Location locationAustinCenter = new Location("Austin, TX");
@@ -128,41 +128,20 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
         int distance = (int) locationAustinCenter.distanceTo(locationVenue);
         holder.distance.setText(Integer.toString(distance) + "m");
 
-//        // Sets the proper rating colour, referenced from the Foursquare Brand Guide
-////        double ratingRaw = frsResults.get(position).venue.rating;
-//        double ratingRaw = distance; // Rating based on distance from Austin, TX, further away is more red
-//        if (ratingRaw <= 2500.0) {
-//            holder.rating.setBackgroundColor(ContextCompat.getColor(context, R.color.FSQKale));
-//        } else if (ratingRaw <= 4000.0) {
-//            holder.rating.setBackgroundColor(ContextCompat.getColor(context, R.color.FSQGuacamole));
-//        } else if (ratingRaw <= 6000.0) {
-//            holder.rating.setBackgroundColor(ContextCompat.getColor(context, R.color.FSQLime));
-//        } else if (ratingRaw <= 8000.0) {
-//            holder.rating.setBackgroundColor(ContextCompat.getColor(context, R.color.FSQBanana));
-//        } else if (ratingRaw <= 12000.0) {
-//            holder.rating.setBackgroundColor(ContextCompat.getColor(context, R.color.FSQOrange));
-//        } else if (ratingRaw <= 16000.0) {
-//            holder.rating.setBackgroundColor(ContextCompat.getColor(context, R.color.FSQMacCheese));
-//        } else {
-//            holder.rating.setBackgroundColor(ContextCompat.getColor(context, R.color.FSQStrawberry));
-//        }
-//        double rating =  Math.ceil(Math.max(16000-ratingRaw,0.0)/160.0)/10.0; // 0.0 -> 10.0 based on max distance of 16000m
-//        holder.rating.setText( Double.toString(rating) ); //String.valueOf((int) rating) );
-
-
-        // Stores item venue detail fields for the map view from the foursquare results // CDA FIX Do this here?
+        // Stores item venue detail fields for the map view from the foursquare results // CDA FIX refactor?
         holder.venueDetails.setName(fv.name);
         holder.venueDetails.setId(fv.id);
         holder.venueDetails.setLatitude(fv.location.lat);
         holder.venueDetails.setLongitude(fv.location.lng);
         holder.venueDetails.setCategoryName(fv.categories.get(0).name);
+
         // Load the category icon
         holder.venueDetails.setCategoryIconURL(
                 fv.categories.get(0).icon.prefix + "bg_88"
               + fv.categories.get(0).icon.suffix );
-        holder.venueDetails.setVenueURL("https://foursquare.com/v/"+fv.id);
+        holder.venueDetails.setVenueURL("https://foursquare.com/v/"+fv.id); // CDA FIX refactor?
 
-        // favorited?
+        // Set favorited
         holder.ivFavorite.setVisibility(View.INVISIBLE); // defaults to invisible
         if ( favoriteVenueIDs != null) {
             for (int i = 0; i < favoriteVenueIDs.size(); i++)
@@ -172,47 +151,13 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
                 }
         }
 
+        // Category icon
         Picasso.with(context)
                 .load(holder.venueDetails.getCategoryIconURL())
                 .resize(95, 95)
                 .into(holder.ivCategoryIcon);
 
-        // *** Get the rating
-        // The base URL for the Foursquare API
-//        String foursquareBaseURL = "https://api.foursquare.com/v2/";
-//
-//        // The client ID and client secret for authenticating with the Foursquare API
-//        String foursquareClientID;
-//        String foursquareClientSecret;
-//
-//        // Get details for the venueID
-//        // Builds Retrofit and FoursquareService objects for calling the Foursquare API and parsing with GSON
-//        Retrofit retrofit = new Retrofit.Builder()
-//                .baseUrl(foursquareBaseURL)
-//                .addConverterFactory(GsonConverterFactory.create())
-//                .build();
-//        FoursquareService foursquare = retrofit.create(FoursquareService.class);
-//
-//        // Gets the stored Foursquare API client ID and client secret from XML
-//        foursquareClientID = context.getResources().getString(R.string.foursquare_client_id);
-//        foursquareClientSecret = context.getResources().getString(R.string.foursquare_client_secret);
-//
-//        // Calls the Foursquare API to get venue details
-//        Call<FoursquareJSON> searchCall = foursquare.searchVenueID(
-//                holder.venueDetails.getId(),
-//                foursquareClientID,
-//                foursquareClientSecret
-//        );
-//        searchCall.enqueue(new Callback<FoursquareJSON>() {
-//            @Override
-//            public void onResponse(Call<FoursquareJSON> call, Response<FoursquareJSON> response) {
-//
-//                // Gets the venue object from the JSON response
-//                FoursquareJSON fjson = response.body();
-//                FoursquareResponse fr = fjson.response;
-//                FoursquareVenue fv = results.get(position).venue;
-
-                // Set the rating and text color
+        // Set the rating and text background color to match
         if( fv.rating > 0) {
             holder.rating.setVisibility(View.VISIBLE);
             holder.rating.setText(Double.toString(fv.rating));
@@ -220,14 +165,6 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
                 holder.rating.setBackgroundColor(Color.parseColor("#" + fv.ratingColor));
         } else
             holder.rating.setVisibility(View.INVISIBLE);
- //           }
-
-//            @Override
-//            public void onFailure(Call<FoursquareJSON> call, Throwable t) {
-//                Toast.makeText(context, "Can't connect to Foursquare's servers!", Toast.LENGTH_LONG).show();
-//                //finish();
-//            }
-//        });
 
     }
 
