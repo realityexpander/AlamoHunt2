@@ -100,7 +100,7 @@ public class MapsActivity extends AppCompatActivity
             LinearLayout ll = findViewById(R.id.multiVenueMap);
             ll.setVisibility(GONE);
 
-            // *** FILL IN DETAILS OF VENUE
+            // *** FILL IN BASIC DETAILS OF VENUE
             // Fill in data field views for Single venue details
             final Venue cv = venuesList.get(CURRENT_VENUE); // current venue
 
@@ -108,7 +108,10 @@ public class MapsActivity extends AppCompatActivity
             if ( cv.getCategoryIconURL() != null)
                 Picasso.with(getApplicationContext()).load(cv.getCategoryIconURL()).into(ivCategoryIcon);
 
-            TextView tvCategoryName = (TextView) findViewById(R.id.tvCategoryName);
+            final TextView tvVenueName = (TextView) findViewById(R.id.tvVenueName);
+            tvVenueName.setText(cv.getName());
+
+            final TextView tvCategoryName = (TextView) findViewById(R.id.tvCategoryName);
             tvCategoryName.setText(cv.getCategoryName());
 
             final TextView tvVenueURL = (TextView) findViewById(R.id.tvFoursquareWebsite);
@@ -184,8 +187,11 @@ public class MapsActivity extends AppCompatActivity
                     FoursquareResponse fr = fjson.response;
                     FoursquareVenue fv = fr.venue;
 
+                    // ***
                     // FILL OUT THE VENUE DATA
-                    tvVenueURL.setText(Double.toString(fv.rating)); // CDA FIX add more details
+                    tvVenueName.setText(fv.name);
+                    tvVenueURL.setText(fv.url);
+//                    Double.toString(fv.rating);
                 }
 
                 @Override

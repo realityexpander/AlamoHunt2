@@ -8,6 +8,8 @@
 package com.realityexpander.alamohunt;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FoursquareLocation implements Serializable {
 
@@ -22,5 +24,13 @@ public class FoursquareLocation implements Serializable {
 
     // The distance of the location, calculated from the specified location.
     int distance;
+
+    String postalCode;
+
+    String city;
+
+    String state;
+
+    List<String> formattedAddress = new ArrayList<String>();
 
 }

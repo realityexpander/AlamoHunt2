@@ -19,6 +19,8 @@ public class FoursquareVenue implements Serializable {
     // The name of the venue.
     String name;
 
+    FoursquareContact contact;
+
     // The rating of the venue, if available.
     double rating;
 
@@ -29,5 +31,9 @@ public class FoursquareVenue implements Serializable {
     FoursquareLocation location;
 
     List<FoursquareCategories> categories = new ArrayList<FoursquareCategories>();
+
+    String url;
+
+    FoursquareHours hours;
 
 }
