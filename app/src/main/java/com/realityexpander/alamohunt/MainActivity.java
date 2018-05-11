@@ -15,9 +15,12 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -25,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void searchButtonClick(View view) {
         Intent i = new Intent(getApplicationContext(), PlacePickerActivity.class);
-
         String searchString = ((AutoCompleteTextView)findViewById(R.id.search)).getText().toString();
         i.putExtra( "_search", searchString );
         startActivity(i);
@@ -74,6 +76,21 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
 
-
+        searchTextView.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
+        searchTextView.setOnEditorActionListener(new AutoCompleteTextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    Intent i = new Intent(getApplicationContext(), PlacePickerActivity.class);
+                    String searchString = ((AutoCompleteTextView)findViewById(R.id.search)).getText().toString();
+                    i.putExtra( "_search", searchString );
+                    startActivity(i);
+                    return true;
+                }
+                return false;
+            }
+        });
     }
+
+
 }

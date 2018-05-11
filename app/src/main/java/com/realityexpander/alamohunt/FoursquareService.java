@@ -22,7 +22,7 @@ public interface FoursquareService {
                                         @Query("query") String searchQuery);
 
     // A request to search for nearby recommendations via the Foursquare API.
-    @GET("search/recommendations?v=20161101&limit=15&near=Austin,TX")
+    @GET("search/recommendations?v=20161101&limit=20&near=Austin,TX")
     Call<FoursquareJSON> searchAutoComplete(@Query("client_id") String clientID,
                                             @Query("client_secret") String clientSecret,
                                             @Query("query") String autoCompleteString      );
