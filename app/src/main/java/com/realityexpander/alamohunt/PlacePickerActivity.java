@@ -85,14 +85,12 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
         // Setup the toolbar UI elements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("Searching...");
         toolbar.setNavigationIcon(android.support.design.R.drawable.abc_ic_ab_back_material);
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
-//                startActivity(new Intent(getApplicationContext(),MainActivity.class));
             }
         });
 
@@ -200,7 +198,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                         foursquareClientID,
                         foursquareClientSecret,
                         // userLL,
-                        // userLLAcc,
+                        // userLLAcc, // CDA todo if we want to make it more location based
                         searchString);
                 searchCall.enqueue(new Callback<FoursquareJSON>() {
                     @Override

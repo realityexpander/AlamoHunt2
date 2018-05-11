@@ -55,6 +55,9 @@ public class AutocompleteAdapter extends ArrayAdapter<Venue> {
 
     @Override
     public int getCount() {
+        if (mVenues == null)
+            return 0;
+
         return mVenues.size();
     }
 
