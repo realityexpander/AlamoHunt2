@@ -41,10 +41,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.realityexpander.alamohunt.PlacePickerActivity" />
         </activity>
-        <activity
-            android:name=".ViewVenueActivity"
-            android:label="@string/title_activity_view_venue"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

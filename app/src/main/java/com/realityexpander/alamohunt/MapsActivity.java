@@ -1,10 +1,18 @@
 /**
- * Filename: MapActivity.java
+ * Filename: MapsActivity.java
  * Author: Chris Athanas
- * Based on Mr. Jitters Foursquare sample app
  *
- * MapActivity represents a map view of a specific venue from PlacePickerActivity.  This activity will
- * allow a user to link back to the Foursquare venue page.
+ * MapActivity represents a map view of either a specific venue or multiple venues
+ * from PlacePickerActivity.
+ *
+ * - If a single venue, show the venue details UI elements of the activity_maps.xml
+ *   - Show venue & city center of austin on map
+ *   - Show details of venue
+ *   - Uses a collapsing toolbar to hide map and show all details
+ *   - Allow user to favorite or unfavorite a venue
+ * - If multiple venues, hide the venue details and display the map of all venues.
+ *   - Hide the venue details
+ *   - Clicking on a venue opens up the single venue view
  */
 
 package com.realityexpander.alamohunt;
@@ -16,7 +24,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
@@ -58,16 +65,11 @@ public class MapsActivity extends AppCompatActivity
     private GoogleMap mMap;
 
     // The details of the venue that is being displayed.
-    private String venueID;
-    private String venueName;
-    private double venueLatitude;
-    private double venueLongitude;
-
     private ArrayList<Venue> venuesList;
     private Marker markerAustin;
-
     private static final double AUSTIN_TX_LATITUDE = 30.2672;
     private static final double AUSTIN_TX_LONGITUDE = -97.7431;
+    private static final int CURRENT_VENUE = 0;
 
     // The base URL for the Foursquare API
     private String foursquareBaseURL = "https://api.foursquare.com/v2/";
@@ -77,7 +79,8 @@ public class MapsActivity extends AppCompatActivity
     private String foursquareClientSecret;
 
     ArrayList<String> favoriteVenueIDs;
-    boolean favorited;
+    boolean favorited; // Current venue favorited
+    String searchString; // String from prev activity intent
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,25 +88,25 @@ public class MapsActivity extends AppCompatActivity
         setContentView(R.layout.activity_maps);
 
         // Retrieves venue(s) details from the intent sent from PlacePickerActivity
-        Bundle venue = getIntent().getExtras();
         venuesList = (ArrayList<Venue>)getIntent().getSerializableExtra("venuesList");
 
-        SupportMapFragment mapFragment = null;
-        if (venuesList.size() == 1) { // Show Single venue screen
+        SupportMapFragment mapFragment;
+        if (venuesList.size() == 1) { // *** Show Single venue screen
             mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map);
 
-            // **** HIDE
+            // **** HIDE MULTI VENUE MAP
             // Hide the multi venue map view
             LinearLayout ll = findViewById(R.id.multiVenueMap);
             ll.setVisibility(GONE);
 
-
-            // *** FILL IN
+            // *** FILL IN DETAILS OF VENUE
             // Fill in data field views for Single venue details
-            final Venue cv = venuesList.get(0); // current venue
+            final Venue cv = venuesList.get(CURRENT_VENUE); // current venue
+
             ImageView ivCategoryIcon = (ImageView) findViewById(R.id.ivCategoryIcon);
-            Picasso.with(getApplicationContext()).load(cv.getCategoryIconURL()).into(ivCategoryIcon);
+            if ( cv.getCategoryIconURL() != null)
+                Picasso.with(getApplicationContext()).load(cv.getCategoryIconURL()).into(ivCategoryIcon);
 
             TextView tvCategoryName = (TextView) findViewById(R.id.tvCategoryName);
             tvCategoryName.setText(cv.getCategoryName());
@@ -111,22 +114,25 @@ public class MapsActivity extends AppCompatActivity
             final TextView tvVenueURL = (TextView) findViewById(R.id.tvFoursquareWebsite);
             tvVenueURL.setText(cv.getVenueURL());
 
-            setTitle(venuesList.get(0).getName());
+            setTitle(venuesList.get(CURRENT_VENUE).getName());
 
+
+            // *** LOAD PREFS
+            // Load preferences (Favorite venue ID's)
             favoriteVenueIDs = LoadPrefs("favoriteVenueIDs");
             if (favoriteVenueIDs == null)
                 favoriteVenueIDs = new ArrayList<>();
+
+            // *** FAB
             // The FAB favorites the venue true/false
             final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
             fab.setImageResource(android.R.drawable.star_big_off); // default to off
             // Set the favorite status on the button
-            if ( favoriteVenueIDs != null) {
-                for (int i = 0; i < favoriteVenueIDs.size(); i++)
-                    if (favoriteVenueIDs.get(i).equals(cv.getId())) {
-                        favorited = true;
-                        fab.setImageResource(android.R.drawable.star_big_on);
-                    }
-            }
+            for (int i = 0; i < favoriteVenueIDs.size(); i++)
+                if (favoriteVenueIDs.get(i).equals(cv.getId())) {
+                    favorited = true;
+                    fab.setImageResource(android.R.drawable.star_big_on);
+                }
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -150,8 +156,7 @@ public class MapsActivity extends AppCompatActivity
                 }
             });
 
-
-            // *** GET VENUE DETAILS
+            // *** GET VENUE DETAILS FROM FOURSQUARE API
             // Get details for the venueID
             // Builds Retrofit and FoursquareService objects for calling the Foursquare API and parsing with GSON
             Retrofit retrofit = new Retrofit.Builder()
@@ -166,7 +171,7 @@ public class MapsActivity extends AppCompatActivity
 
             // Calls the Foursquare API to get venue details
             Call<FoursquareJSON> searchCall = foursquare.searchVenueID(
-                    venuesList.get(0).getId(),
+                    venuesList.get(CURRENT_VENUE).getId(),
                     foursquareClientID,
                     foursquareClientSecret
                     );
@@ -179,7 +184,8 @@ public class MapsActivity extends AppCompatActivity
                     FoursquareResponse fr = fjson.response;
                     FoursquareVenue fv = fr.venue;
 
-                    tvVenueURL.setText(Double.toString(fv.rating));
+                    // FILL OUT THE VENUE DATA
+                    tvVenueURL.setText(Double.toString(fv.rating)); // CDA FIX add more details
                 }
 
                 @Override
@@ -190,11 +196,18 @@ public class MapsActivity extends AppCompatActivity
             });
 
 
-        } else { // Show multi venue screen
+        } else { // *** Show multi venue view
             mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map2);
+            
+            // Get the search from prev screen intent
+            Bundle extras = getIntent().getExtras();
+            if (extras != null) {
+                searchString = extras.getString("_search");
+                setTitle("Search: "+ searchString);
+            }
 
-            // Hide the single venue map views
+            // Hide the single venue map view items
             LinearLayout ll = findViewById(R.id.appbar);
             ll.setVisibility(GONE);
             FloatingActionButton fab = findViewById(R.id.fab);
@@ -207,8 +220,6 @@ public class MapsActivity extends AppCompatActivity
             ll.setVisibility(VISIBLE);
         }
         mapFragment.getMapAsync(this);
-
-
     }
 
     public void SavePrefs( ArrayList<String> list, String key) {
@@ -232,7 +243,9 @@ public class MapsActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
+//                NavUtils.navigateUpFromSameTask(this);
+
+                finish();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -246,20 +259,14 @@ public class MapsActivity extends AppCompatActivity
         int h = getResources().getDisplayMetrics().heightPixels;
         int padding = (int) (w * 0.22); // offset from edges of the map 22% of screen
 
-//        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-//            @Override
-//            public void onMapLoaded() {
-//                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 250));
-//            }
-//        });
-
+        // ***
         // Creates and displays marker and info window for the venue
         // If there is a single item in the array, then do a single venue layout.
         // If there are multiple items in the array, then do a multi-venue layout.
         Marker marker=null;
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
-        // Centers and zooms the map into the selected venue + city of Austin
+        // For single venues, centers and zooms the map around the selected venue + city of Austin
         if(venuesList.size() == 1) { // only one venue? Add center of austin
             // Add center of Austin
             LatLng austinLatLong = new LatLng(AUSTIN_TX_LATITUDE, AUSTIN_TX_LONGITUDE);
@@ -269,7 +276,7 @@ public class MapsActivity extends AppCompatActivity
                     .snippet("Home of Alamo Drafthouse"));
             builder.include(austinLatLong);
 
-//                    mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 250)); // CDA NOTE - calling this sometimes crashes...
+            // mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 250)); // CDA NOTE - calling this sometimes crashes...
         }
 
          // Find the bounding box for the list of venues
@@ -288,19 +295,18 @@ public class MapsActivity extends AppCompatActivity
         }
         LatLngBounds bounds = builder.build();
 
-        // Zoom Fudge factor for single venue height layout
+        // Zoom Fudge factor for single venue height layout // CDA todo fix this to reflect view size for map from resources
         if(venuesList.size()==1)
             mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h/3, 250));
         else
             mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, padding));
 
         marker.showInfoWindow();
-
         mMap.setOnInfoWindowClickListener(this);
 
+        // Show my location on map
         // Checks for location permissions at runtime (required for API >= 23)
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
             // Shows the user's current location
             mMap.setMyLocationEnabled(true);
         }
@@ -313,8 +319,7 @@ public class MapsActivity extends AppCompatActivity
         if(venuesList.size()==1) {
             if (!marker.equals(markerAustin)) { // Dont show info for austin
                 // Opens the Foursquare venue page when a user clicks on the info window of the venue
-//                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://foursquare.com/v/" + venuesList.get(0).getId()));
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(venuesList.get(0).getVenueURL()));
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(venuesList.get(CURRENT_VENUE).getVenueURL()));
                 startActivity(browserIntent);
             }
         } else {
@@ -335,6 +340,7 @@ public class MapsActivity extends AppCompatActivity
                             venuesList.get(i).getVenueURL()));
                     // Passes the crucial venue details onto the map view
                     intent.putExtra("venuesList", venueResults);
+                    intent.putExtra( "_search", searchString );
                     startActivity(intent);
                 }
             }

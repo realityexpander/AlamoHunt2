@@ -1,8 +1,8 @@
 /**
  * Filename: FoursquareGroup.java
- * Author: Matthew Huie
+ * Author: Chris Athanas
  *
- * FoursquareGroup describes a group object from the Foursquare API.
+ * FoursquareGroup describes group of objects from the Foursquare API.
  */
 
 package com.realityexpander.alamohunt;

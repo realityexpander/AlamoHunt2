@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -12,11 +13,11 @@
         android:id="@+id/placePickerCategoryIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/placePickerItemName"
-        android:layout_toEndOf="@+id/placePickerItemName"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        app:srcCompat="@android:drawable/btn_star_big_on" />
+        android:layout_alignTop="@+id/placePickerItemName"
+        android:layout_toEndOf="@+id/placePickerItemName"
+        android:paddingTop="3dp" />
 
     <TextView
         android:id="@+id/placePickerItemName"
@@ -24,12 +25,14 @@
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignTop="@+id/placePickerItemRating"
-        android:layout_marginStart="48dp"
+        android:layout_marginStart="45dp"
         android:ellipsize="end"
+        android:fadingEdge="horizontal"
         android:maxLines="1"
         android:text="Venue Name"
         android:textSize="16sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:ignore="HardcodedText" />
 
     <TextView
         android:id="@+id/placePickerItemAddress"
@@ -39,7 +42,8 @@
         android:layout_below="@+id/placePickerItemName"
         android:ellipsize="end"
         android:maxLines="1"
-        android:text="address" />
+        android:text="address"
+        tools:ignore="HardcodedText" />
 
     <TextView
         android:id="@+id/placePickerItemRating"
@@ -52,17 +56,19 @@
         android:text="Rating"
         android:textColor="@color/white"
         android:textSize="14sp"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        tools:ignore="HardcodedText" />
 
     <TextView
         android:id="@+id/placePickerItemDistance"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_centerVertical="true"
-        android:layout_marginEnd="16dp"
-        android:layout_toStartOf="@id/placePickerItemRating"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/placePickerItemName"
+        android:layout_marginEnd="65dp"
         android:text="dx"
-        android:textSize="12sp" />
+        android:textSize="12sp"
+        tools:ignore="HardcodedText" />
 
     <ImageView
         android:id="@+id/placePickerFavorite"

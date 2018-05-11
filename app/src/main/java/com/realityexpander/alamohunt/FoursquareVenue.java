@@ -1,6 +1,6 @@
 /**
  * Filename: FoursquareVenue.java
- * Author: Matthew Huie
+ * Author: Chris Athanas
  *
  * FoursquareVenue describes a venue object from the Foursquare API.
  */
@@ -29,7 +29,5 @@ public class FoursquareVenue implements Serializable {
     FoursquareLocation location;
 
     List<FoursquareCategories> categories = new ArrayList<FoursquareCategories>();
-
-
 
 }

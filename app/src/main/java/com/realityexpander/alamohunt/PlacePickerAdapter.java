@@ -5,6 +5,8 @@
  * PlacePickerAdapter represents the adapter for attaching venue data to the RecyclerView within
  * PlacePickerActivity.  This adapter will handle a list of incoming FoursquareResults and parse them
  * into the view.
+ *
+ * - Uses Picasso to load images
  */
 
 package com.realityexpander.alamohunt;
@@ -34,6 +36,11 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
 
     // The application context for getting resources
     private Context context;
+
+    private static final double AUSTIN_TX_LATITUDE = 30.2672;
+    private static final double AUSTIN_TX_LONGITUDE = -97.7431;
+
+    private static final int FIRST_CATEGORY = 0;
 
     // The list of frsResults from the Foursquare API
     private List<FoursquareResults> results;
@@ -114,13 +121,11 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
 
         // Sets each view with the appropriate venue details
         holder.name.setText(fv.name);
-        if (fv.categories.get(0) != null )
-            holder.category.setText(fv.categories.get(0).name);
 
         // Calc distance to center of Austin, TX (30.2672° N, 97.7431° W)
         Location locationAustinCenter = new Location("Austin, TX");
-        locationAustinCenter.setLatitude(30.2672); // CDA FIX put into strings
-        locationAustinCenter.setLongitude(-97.7431);
+        locationAustinCenter.setLatitude(AUSTIN_TX_LATITUDE);
+        locationAustinCenter.setLongitude(AUSTIN_TX_LONGITUDE);
 
         Location locationVenue = new Location(fv.name);
         locationVenue.setLatitude(fv.location.lat);
@@ -128,20 +133,28 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
         int distance = (int) locationAustinCenter.distanceTo(locationVenue);
         holder.distance.setText(Integer.toString(distance) + "m");
 
-        // Stores item venue detail fields for the map view from the foursquare results // CDA FIX refactor?
+        // Stores item venue detail fields for the map view from the foursquare results
         holder.venueDetails.setName(fv.name);
         holder.venueDetails.setId(fv.id);
         holder.venueDetails.setLatitude(fv.location.lat);
         holder.venueDetails.setLongitude(fv.location.lng);
-        holder.venueDetails.setCategoryName(fv.categories.get(0).name);
 
-        // Load the category icon
-        holder.venueDetails.setCategoryIconURL(
-                fv.categories.get(0).icon.prefix + "bg_88"
-              + fv.categories.get(0).icon.suffix );
-        holder.venueDetails.setVenueURL("https://foursquare.com/v/"+fv.id); // CDA FIX refactor?
 
-        // Set favorited
+        if (fv.categories.size() == 0 ) { // Missing the category name?
+            holder.category.setText("N/A");
+            holder.venueDetails.setCategoryName("N/A");
+            holder.venueDetails.setCategoryIconURL(null);
+        } else {
+            holder.category.setText(fv.categories.get(FIRST_CATEGORY).name);
+            holder.venueDetails.setCategoryName(fv.categories.get(FIRST_CATEGORY).name);
+            // Load the category icon
+            holder.venueDetails.setCategoryIconURL(
+                    fv.categories.get(FIRST_CATEGORY).icon.prefix + "bg_88" + fv.categories.get(FIRST_CATEGORY).icon.suffix);
+        }
+
+        holder.venueDetails.setVenueURL("https://foursquare.com/v/"+fv.id); // CDA FIX refactor? do this calc in a func
+
+        // Set if favorited
         holder.ivFavorite.setVisibility(View.INVISIBLE); // defaults to invisible
         if ( favoriteVenueIDs != null) {
             for (int i = 0; i < favoriteVenueIDs.size(); i++)
@@ -152,10 +165,12 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
         }
 
         // Category icon
-        Picasso.with(context)
-                .load(holder.venueDetails.getCategoryIconURL())
-                .resize(95, 95)
-                .into(holder.ivCategoryIcon);
+        if (holder.venueDetails.getCategoryIconURL() != null) {
+            Picasso.with(context)
+                    .load(holder.venueDetails.getCategoryIconURL())
+                    .resize(95, 95)
+                    .into(holder.ivCategoryIcon);
+        }
 
         // Set the rating and text background color to match
         if( fv.rating > 0) {

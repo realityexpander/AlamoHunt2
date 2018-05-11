@@ -1,3 +1,15 @@
+/**
+ * Filename: PlacePickerActivity.java
+ * Author: Chris Athanas
+ *
+ * PlacePickerActivity represents a list view of venues of interest and a FAB
+ *
+ * - Shows basic venue information like category, rating, rating color, category icon,
+ *   distance from Austin city center.
+ * - If click on a single list item, show the venue details.
+ * - If click FAB will show the map of all venues.
+ */
+
 package com.realityexpander.alamohunt;
 
 import android.content.Context;
@@ -17,7 +29,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -41,7 +52,6 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
     private GoogleApiClient mGoogleApiClient;
 
     // The TextView for displaying the current location
-    private TextView snapToPlace;
     private ProgressBar spinner;
 
     // The RecyclerView and associated objects for displaying the nearby coffee spots
@@ -50,11 +60,12 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
     private RecyclerView.Adapter placePickerAdapter;
 
     // The base URL for the Foursquare API
-    private String foursquareBaseURL = "https://api.foursquare.com/v2/";
-
+    private String foursquareBaseURL;
     // The client ID and client secret for authenticating with the Foursquare API
     private String foursquareClientID;
     private String foursquareClientSecret;
+
+    // Users search string
     private String searchString;
 
     // The list of frsResults from the Foursquare API
@@ -62,22 +73,24 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
     private ArrayList<Venue> venueResults;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_picker);
 
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            searchString = extras.getString("_search");
+        }
+
         // Setup the toolbar UI elements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("Searching...");
         toolbar.setNavigationIcon(android.support.design.R.drawable.abc_ic_ab_back_material);
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 finish();
-//                startActivity(new Intent(getApplicationContext(),MainActivity.class));
             }
         });
 
@@ -102,34 +115,40 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                 // Build the list of venues from the foursquare response
                 venueResults = new ArrayList<>();
                 for(int n = 0; n< frsResults.size(); n++) {
+                    String category;
+                    String categoryIconURL;
+
+                    if (frsResults.get(n).venue.categories.size() == 0) {
+                        category = "";
+                        categoryIconURL = null;
+                    } else {
+                        category = frsResults.get(n).venue.categories.get(0).name;
+                        categoryIconURL = frsResults.get(n).venue.categories.get(0).icon.prefix
+                                + "bg_88" // CDA FIX todo - Make constant FOURSQUARE_ICON_SIZE
+                                + frsResults.get(n).venue.categories.get(0).icon.suffix;
+                    }
+
                     venueResults.add(new Venue( frsResults.get(n).venue.name,
                                                 frsResults.get(n).venue.id,
-                                                frsResults.get(n).venue.categories.get(0).name,
+                                                category,
                                                 frsResults.get(n).venue.location.lat,
                                                 frsResults.get(n).venue.location.lng,
-                                                frsResults.get(n).venue.categories.get(0).icon.prefix
-                                              + "bg_88" // CDA FIX - Make constant FOURSQUARE_ICON_SIZE
-                                              + frsResults.get(n).venue.categories.get(0).icon.suffix,
-                                      "https://foursquare.com/v/"+frsResults.get(n).venue.id
+                                                categoryIconURL,
+                                      "https://foursquare.com/v/"+frsResults.get(n).venue.id  // CDA FIX -> Strings.xml
                     ) );
                 }
                 // Passes the crucial venue details onto the map view
                 i.putExtra("venuesList", venueResults);
-                i.putExtra("frsResults", frsResults); // pass in the full results too (to be passed back from maps) // CDA FIX?
+                i.putExtra("frsResults", frsResults); // pass in the full results too (to be passed back from maps) // CDA FIX
+                i.putExtra("_search", searchString);
 
                 // Transitions to the map view.
                 context.startActivity(i);
             }
         });
 
-        // Get the search from prev screen
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            searchString = extras.getString("_search");
-        }
 
         // The visible TextView and RecyclerView objects
-//        snapToPlace = (TextView)findViewById(R.id.snapToPlace);
         placePicker = (RecyclerView)findViewById(R.id.placePickerList);
 
         // Sets the dimensions, LayoutManager, and dividers for the RecyclerView
@@ -146,6 +165,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                 .build();
 
         // Gets the stored Foursquare API client ID and client secret from XML
+        foursquareBaseURL = getResources().getString(R.string.foursquare_base_URL);
         foursquareClientID = getResources().getString(R.string.foursquare_client_id);
         foursquareClientSecret = getResources().getString(R.string.foursquare_client_secret);
     }
@@ -163,8 +183,6 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
                 Toolbar toolbar = findViewById(R.id.toolbar);
                 toolbar.setTitle("Search: " + searchString);
-//                setSupportActionBar(toolbar);
-//                snapToPlace.setText("Here's some "+ searchString +" nearby in Austin, TX");
 
                 // ***
                 // Find venues matching the search criteria
@@ -180,7 +198,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                         foursquareClientID,
                         foursquareClientSecret,
                         // userLL,
-                        // userLLAcc,
+                        // userLLAcc, // CDA todo if we want to make it more location based
                         searchString);
                 searchCall.enqueue(new Callback<FoursquareJSON>() {
                     @Override
@@ -193,6 +211,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                                                                         .get("meta"))
                                                                         .getString("errorDetail"), Toast.LENGTH_LONG).show();
                             } catch (Exception e) {
+                                Log.d("CDA", "EXCEPTION " + e);
                                 Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                             }
                             finish();
@@ -214,7 +233,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
                         // ***
                         // Go thru each of the venues and get the ratings with another call to /venues/VENUE_ID
-                        // for venues[i], Get the rating & rating color.
+                        // for venues[0..n], Get the rating & rating color.
                         // Fill in frs.rating with the rating from /venues/VENUE_ID endpoint
                         for( int i=0; i < frs.size(); i++) {
 
@@ -252,7 +271,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                                             // search the list for the matching ID
                                             for(int n=0; n<frs.size(); n++) {
                                                 if (frs.get(n).venue.id.equals(fv.id)
-                                                        &&  frs.get(n).venue.rating != fv.rating)  { // if its already set, no need to update the Recyclerview
+                                                        &&  frs.get(n).venue.rating != fv.rating)  { // if rating is already set, no need to update the Recyclerview
                                                     frs.get(n).venue.rating = fv.rating;
                                                     if (fv.ratingColor != null)
                                                         frs.get(n).venue.ratingColor = fv.ratingColor;
@@ -274,7 +293,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                                 });
 
                             } catch (Exception e) {
-                                Log.d("HUS", "EXCEPTION " + e);
+                                Log.d("CDA", "EXCEPTION " + e);
                                 Toast.makeText(getApplicationContext(), "Can't connect to Foursquare's servers!", Toast.LENGTH_LONG).show();
                                 finish();
                             }

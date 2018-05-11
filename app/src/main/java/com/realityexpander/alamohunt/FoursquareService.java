@@ -1,6 +1,6 @@
 /**
  * Filename: FoursquareService.java
- * Author: Matthew Huie
+ * Author: Chris Athanas
  *
  * FoursquareService provides a Retrofit interface for the Foursquare API.
  */
@@ -14,19 +14,6 @@ import retrofit2.http.Query;
 
 public interface FoursquareService {
 
-    // A request to snap the current user to a place via the Foursquare API.
-    @GET("venues/search?v=20161101&limit=1")
-    Call<FoursquareJSON> snapToPlace(@Query("client_id") String clientID,
-                                     @Query("client_secret") String clientSecret,
-                                     @Query("ll") String ll,
-                                     @Query("llAcc") double llAcc);
-
-    // A request to search for nearby coffee shop recommendations via the Foursquare API.
-    @GET("search/recommendations?v=20161101&intent=coffee")
-    Call<FoursquareJSON> searchCoffee(@Query("client_id") String clientID,
-                                      @Query("client_secret") String clientSecret,
-                                      @Query("ll") String ll,
-                                      @Query("llAcc") double llAcc);
 
     // A request to search for nearby places via Foursquare API
     @GET("search/recommendations?v=20161101&near=Austin,TX")
@@ -35,7 +22,7 @@ public interface FoursquareService {
                                         @Query("query") String searchQuery);
 
     // A request to search for nearby recommendations via the Foursquare API.
-    @GET("search/recommendations?v=20161101&limit=10&near=Austin,TX")
+    @GET("search/recommendations?v=20161101&limit=20&near=Austin,TX")
     Call<FoursquareJSON> searchAutoComplete(@Query("client_id") String clientID,
                                             @Query("client_secret") String clientSecret,
                                             @Query("query") String autoCompleteString      );
@@ -44,6 +31,5 @@ public interface FoursquareService {
     @GET("venues/{venue_id}?v=20161101")
     Call<FoursquareJSON> searchVenueID( @Path("venue_id") String venueID,
                                         @Query("client_id") String clientID,
-                                        @Query("client_secret") String clientSecret
-                                        );
+                                        @Query("client_secret") String clientSecret );
 }
