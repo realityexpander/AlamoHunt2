@@ -296,8 +296,12 @@ public class MapsActivity extends AppCompatActivity
         LatLngBounds bounds = builder.build();
 
         // Zoom Fudge factor for single venue height layout // CDA todo fix this to reflect view size for map from resources
-        if(venuesList.size()==1)
-            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h/3, 250));
+        if(venuesList.size()==1) {
+             if( w > h)
+                 mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, 400));
+            else
+                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h/2, 450));
+        }
         else
             mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, padding));
 
