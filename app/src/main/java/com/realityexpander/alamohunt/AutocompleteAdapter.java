@@ -51,7 +51,6 @@ public class AutocompleteAdapter extends ArrayAdapter<Venue> {
         foursquareClientID = mContext.getResources().getString(R.string.foursquare_client_id);
         foursquareClientSecret = mContext.getResources().getString(R.string.foursquare_client_secret);
         foursquareBaseURL = mContext.getResources().getString(R.string.foursquare_base_URL);
-
     }
 
     @Override

@@ -38,11 +38,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // CDA Leave this in case we want to make it location based in next revision
         // Requests for location permissions at runtime (required for API >= 23)
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_ACCESS_FINE_LOCATION);
         }
-
 
         // setup the autocomplete search edit text
         final CustomBackAutoCompleteTextView searchTextView = (CustomBackAutoCompleteTextView) findViewById(R.id.search);
@@ -55,8 +55,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Venue venueName = (Venue) parent.getItemAtPosition(position);
+
+                // Fill in the Search text with the item just clicked
                 searchTextView.setText(venueName.getName());
-                searchTextView.setSelection(searchTextView.getText().length()); // End point Cursor
+                searchTextView.setSelection(searchTextView.getText().length()); // Put edit text cursor at end of the line
+
+                // Start the search
+                Intent i = new Intent(getApplicationContext(), PlacePickerActivity.class);
+                String searchString = venueName.getName();
+                i.putExtra( "_search", searchString );
+                startActivity(i);
             }
         });
 

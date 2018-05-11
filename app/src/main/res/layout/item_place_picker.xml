@@ -16,7 +16,7 @@
         android:layout_toEndOf="@+id/placePickerItemName"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        app:srcCompat="@android:drawable/btn_star_big_on" />
+        />
 
     <TextView
         android:id="@+id/placePickerItemName"

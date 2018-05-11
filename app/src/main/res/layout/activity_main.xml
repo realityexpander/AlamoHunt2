@@ -38,13 +38,4 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.046" />
 
-    <ProgressBar
-        android:id="@+id/progressBar2"
-        style="@style/?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="invisible"
-        tools:layout_editor_absoluteX="236dp"
-        tools:layout_editor_absoluteY="28dp" />
-
 </android.support.constraint.ConstraintLayout>

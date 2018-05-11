@@ -91,7 +91,7 @@ public class MapsActivity extends AppCompatActivity
         venuesList = (ArrayList<Venue>)getIntent().getSerializableExtra("venuesList");
 
         SupportMapFragment mapFragment;
-        if (venuesList.size() == 1) { // Show Single venue screen
+        if (venuesList.size() == 1) { // *** Show Single venue screen
             mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map);
 
@@ -105,7 +105,8 @@ public class MapsActivity extends AppCompatActivity
             final Venue cv = venuesList.get(CURRENT_VENUE); // current venue
 
             ImageView ivCategoryIcon = (ImageView) findViewById(R.id.ivCategoryIcon);
-            Picasso.with(getApplicationContext()).load(cv.getCategoryIconURL()).into(ivCategoryIcon);
+            if ( cv.getCategoryIconURL() != null)
+                Picasso.with(getApplicationContext()).load(cv.getCategoryIconURL()).into(ivCategoryIcon);
 
             TextView tvCategoryName = (TextView) findViewById(R.id.tvCategoryName);
             tvCategoryName.setText(cv.getCategoryName());
@@ -114,6 +115,7 @@ public class MapsActivity extends AppCompatActivity
             tvVenueURL.setText(cv.getVenueURL());
 
             setTitle(venuesList.get(CURRENT_VENUE).getName());
+
 
             // *** LOAD PREFS
             // Load preferences (Favorite venue ID's)
