@@ -64,50 +64,124 @@
         app:layout_anchorGravity="bottom"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tvCategoryName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="50dp"
-                android:text="Banking"
-                android:textStyle="bold"
-                tools:textColor="@color/cast_expanded_controller_background_color" />
 
             <ImageView
                 android:id="@+id/ivCategoryIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginStart="50dp"
-                android:layout_marginBottom="10dp"
-                android:adjustViewBounds="true"
-                android:contentDescription="@string/mr_user_route_category_name"
+                android:layout_below="@id/nestedScrollView"
+                android:layout_marginTop="20dp"
+                android:adjustViewBounds="false"
+                android:baselineAlignBottom="false"
+                android:padding="8dp"
                 android:visibility="visible"
                 app:srcCompat="@drawable/cast_ic_notification_stop_live_stream" />
 
             <TextView
-                android:id="@+id/tvFoursquareWebsite"
-                android:layout_width="match_parent"
+                android:id="@+id/tvCategoryName"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="50dp"
-                android:autoLink="web"
-                android:text="http://foursquare.com"
-                android:textStyle="bold"
-                tools:textColor="@color/cast_expanded_controller_background_color" />
+                android:layout_alignTop="@+id/ivCategoryIcon"
+                android:layout_marginTop="10dp"
+                android:layout_toEndOf="@id/ivCategoryIcon"
+                android:text="Taco Place"
+                tools:textColor="@color/black" />
 
-        </LinearLayout>
+            <TextView
+                android:id="@+id/tvFoursquareWebsite"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@id/tvCategoryName"
+                android:layout_alignTop="@id/tvCategoryName"
+                android:layout_marginTop="20dp"
+                android:text="http://foursquare.com"
+                tools:textColor="@color/black" />
+
+            <!--<TextView-->
+                <!--android:id="@+id/tvFoursquareWebsite"-->
+                <!--android:layout_width="357dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentEnd="true"-->
+                <!--android:layout_alignParentTop="true"-->
+                <!--android:layout_marginTop="67dp"-->
+                <!--android:autoLink="web"-->
+                android:text="http://foursquare.com"
+                <!--android:textStyle="bold"-->
+                <!--tools:textColor="@color/black" />-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/tvPhoneNumber"-->
+                <!--android:layout_width="357dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentEnd="true"-->
+                <!--android:layout_alignParentTop="true"-->
+                <!--android:layout_marginTop="74dp"-->
+                <!--android:autoLink="phone"-->
+                <!--android:text="512 555 1212"-->
+                <!--tools:textColor="@color/black" />-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/tvFacebookUsername"-->
+                <!--android:layout_width="357dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentEnd="true"-->
+                <!--android:layout_alignParentTop="true"-->
+                <!--android:layout_marginTop="81dp"-->
+                <!--android:autoLink="web"-->
+                <!--android:text="veracruztacos"-->
+                <!--tools:textColor="@color/black" />-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/tvAddress"-->
+                <!--android:layout_width="357dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentEnd="true"-->
+                <!--android:layout_alignParentTop="true"-->
+                <!--android:layout_marginTop="88dp"-->
+                <!--android:autoLink="web"-->
+                <!--android:text="1704 E Cesar Chavez St"-->
+                <!--tools:textColor="@color/black" />-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/tvZipcode"-->
+                <!--android:layout_width="357dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentEnd="true"-->
+                <!--android:layout_alignParentTop="true"-->
+                <!--android:layout_marginTop="95dp"-->
+                <!--android:autoLink="web"-->
+                <!--android:text="78702"-->
+                <!--tools:textColor="@color/black" />-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/tvMenuUrl"-->
+                <!--android:layout_width="357dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentEnd="true"-->
+                <!--android:layout_alignParentTop="true"-->
+                <!--android:layout_marginTop="102dp"-->
+                <!--android:autoLink="web"-->
+                <!--android:text="http://veracruztacos.com/img/cesar_chavez.pdf"-->
+                <!--tools:textColor="@color/black" />-->
+
+            <!--<TextView-->
+                <!--android:id="@+id/tvLikesCount"-->
+                <!--android:layout_width="357dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_alignParentEnd="true"-->
+                <!--android:layout_alignParentTop="true"-->
+                <!--android:layout_marginTop="109dp"-->
+                <!--android:autoLink="web"-->
+                <!--android:text="289 likes"-->
+                <!--tools:textColor="@color/black" />-->
+
+
+
+        </RelativeLayout>
 
     </android.support.v4.widget.NestedScrollView>
 
@@ -116,7 +190,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:visibility="invisible"
+        android:visibility="gone"
         app:layout_anchor="@+id/multiVenueMap"
         app:layout_anchorGravity="left|bottom">
 

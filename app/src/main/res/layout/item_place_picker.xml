@@ -61,12 +61,15 @@
 
     <TextView
         android:id="@+id/placePickerItemDistance"
-        android:layout_width="wrap_content"
+        android:layout_width="49dp"
         android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/placePickerItemAddress"
         android:layout_alignParentEnd="true"
-        android:layout_below="@+id/placePickerItemName"
-        android:layout_marginEnd="65dp"
+        android:layout_alignRight="@id/placePickerItemRating"
+        android:layout_marginEnd="50dp"
+        android:layout_marginStart="101dp"
         android:text="dx"
+        android:textAlignment="viewEnd"
         android:textSize="12sp"
         tools:ignore="HardcodedText" />
 
@@ -75,6 +78,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/placePickerItemName"
+        android:layout_marginTop="-5dp"
         android:layout_toEndOf="@+id/placePickerItemName"
         android:visibility="invisible"
         app:srcCompat="@android:drawable/btn_star_big_on" />
