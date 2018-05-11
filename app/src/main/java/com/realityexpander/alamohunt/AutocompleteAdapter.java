@@ -75,15 +75,20 @@ public class AutocompleteAdapter extends ArrayAdapter<Venue> {
                 FilterResults filterResults = new FilterResults();
                 if (constraint != null) {
                     String term = constraint.toString();
-                    mVenues.clear();
+                    if(mVenues!=null)
+                        mVenues.clear();
                     try {
-                        //get suggestions from the foursquare api (Done Async here)
+                        //get suggestions from the foursquare api
+                        // (Done synchronously here, we are already off the UI thread)
                         mVenues = findVenues(term);
                     } catch (Exception e) {
                         Log.d("CDA", "EXCEPTION " + e);
                     }
                     filterResults.values = mVenues;
-                    filterResults.count = mVenues.size();
+                    if(mVenues != null)
+                        filterResults.count = mVenues.size();
+                    else
+                        filterResults.count = 0;
                 }
                 return filterResults;
             }
@@ -157,17 +162,22 @@ public class AutocompleteAdapter extends ArrayAdapter<Venue> {
 
             Venue theVenue;
             for (int i = 0; i < frs.size(); i++) {
+                String category;
                 // Store the venues to the suggestion list
+                if(frs.get(i).venue.categories.size() == 0) // category may be empty for some venues
+                    category = "N/A";
+                else
+                    category = frs.get(i).venue.categories.get(0).name;
                 theVenue = new Venue(frs.get(i).venue.name,
                                      frs.get(i).venue.id,
-                                     frs.get(i).venue.categories.get(0).name
+                                     category
                 );
                 suggestList.add(theVenue);
             }
 
 
         } catch (Exception e) {
-            Log.d("HUS", "EXCEPTION " + e);
+            Log.d("CDA", "EXCEPTION " + e);
             Toast.makeText(mContext, "Can't connect to Foursquare's servers!", Toast.LENGTH_LONG).show();
             return null;
         }

@@ -9,7 +9,6 @@
 
 package com.realityexpander.alamohunt;
 
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -17,7 +16,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 
@@ -68,13 +66,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        searchTextView.setOnDismissListener(new AutoCompleteTextView.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                in.hideSoftInputFromWindow(getCurrentFocus().getApplicationWindowToken(), 0);
-            }
-        });
+//        searchTextView.setOnDismissListener(new AutoCompleteTextView.OnDismissListener() {
+//            @Override
+//            public void onDismiss() {
+//                InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//                in.hideSoftInputFromWindow(getCurrentFocus().getApplicationWindowToken(), 0);
+//            }
+//        });
 
 
     }

@@ -31,6 +31,5 @@ public interface FoursquareService {
     @GET("venues/{venue_id}?v=20161101")
     Call<FoursquareJSON> searchVenueID( @Path("venue_id") String venueID,
                                         @Query("client_id") String clientID,
-                                        @Query("client_secret") String clientSecret
-                                        );
+                                        @Query("client_secret") String clientSecret );
 }
