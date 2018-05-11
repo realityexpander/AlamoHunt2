@@ -154,7 +154,7 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
 
         holder.venueDetails.setVenueURL("https://foursquare.com/v/"+fv.id); // CDA FIX refactor? do this calc in a func
 
-        // Set favorited
+        // Set if favorited
         holder.ivFavorite.setVisibility(View.INVISIBLE); // defaults to invisible
         if ( favoriteVenueIDs != null) {
             for (int i = 0; i < favoriteVenueIDs.size(); i++)

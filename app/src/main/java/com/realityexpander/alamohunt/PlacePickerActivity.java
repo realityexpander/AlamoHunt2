@@ -78,6 +78,11 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_place_picker);
 
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            searchString = extras.getString("_search");
+        }
+
         // Setup the toolbar UI elements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Searching...");
@@ -112,31 +117,38 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                 // Build the list of venues from the foursquare response
                 venueResults = new ArrayList<>();
                 for(int n = 0; n< frsResults.size(); n++) {
+                    String category;
+                    String categoryIconURL;
+
+                    if (frsResults.get(n).venue.categories.size() == 0) {
+                        category = "";
+                        categoryIconURL = null;
+                    } else {
+                        category = frsResults.get(n).venue.categories.get(0).name;
+                        categoryIconURL = frsResults.get(n).venue.categories.get(0).icon.prefix
+                                + "bg_88" // CDA FIX todo - Make constant FOURSQUARE_ICON_SIZE
+                                + frsResults.get(n).venue.categories.get(0).icon.suffix;
+                    }
+
                     venueResults.add(new Venue( frsResults.get(n).venue.name,
                                                 frsResults.get(n).venue.id,
-                                                frsResults.get(n).venue.categories.get(0).name,
+                                                category,
                                                 frsResults.get(n).venue.location.lat,
                                                 frsResults.get(n).venue.location.lng,
-                                                frsResults.get(n).venue.categories.get(0).icon.prefix
-                                              + "bg_88" // CDA FIX - Make constant FOURSQUARE_ICON_SIZE
-                                              + frsResults.get(n).venue.categories.get(0).icon.suffix,
+                                                categoryIconURL,
                                       "https://foursquare.com/v/"+frsResults.get(n).venue.id  // CDA FIX -> Strings.xml
                     ) );
                 }
                 // Passes the crucial venue details onto the map view
                 i.putExtra("venuesList", venueResults);
                 i.putExtra("frsResults", frsResults); // pass in the full results too (to be passed back from maps) // CDA FIX
+                i.putExtra("_search", searchString);
 
                 // Transitions to the map view.
                 context.startActivity(i);
             }
         });
 
-        // Get the search from prev screen
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            searchString = extras.getString("_search");
-        }
 
         // The visible TextView and RecyclerView objects
         placePicker = (RecyclerView)findViewById(R.id.placePickerList);

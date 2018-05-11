@@ -24,7 +24,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
@@ -81,6 +80,7 @@ public class MapsActivity extends AppCompatActivity
 
     ArrayList<String> favoriteVenueIDs;
     boolean favorited; // Current venue favorited
+    String searchString; // String from prev activity intent
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,13 +128,11 @@ public class MapsActivity extends AppCompatActivity
             final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
             fab.setImageResource(android.R.drawable.star_big_off); // default to off
             // Set the favorite status on the button
-            if ( favoriteVenueIDs != null) {
-                for (int i = 0; i < favoriteVenueIDs.size(); i++)
-                    if (favoriteVenueIDs.get(i).equals(cv.getId())) {
-                        favorited = true;
-                        fab.setImageResource(android.R.drawable.star_big_on);
-                    }
-            }
+            for (int i = 0; i < favoriteVenueIDs.size(); i++)
+                if (favoriteVenueIDs.get(i).equals(cv.getId())) {
+                    favorited = true;
+                    fab.setImageResource(android.R.drawable.star_big_on);
+                }
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -187,7 +185,7 @@ public class MapsActivity extends AppCompatActivity
                     FoursquareVenue fv = fr.venue;
 
                     // FILL OUT THE VENUE DATA
-                    tvVenueURL.setText(Double.toString(fv.rating));
+                    tvVenueURL.setText(Double.toString(fv.rating)); // CDA FIX add more details
                 }
 
                 @Override
@@ -198,9 +196,16 @@ public class MapsActivity extends AppCompatActivity
             });
 
 
-        } else { // Show multi venue views
+        } else { // *** Show multi venue view
             mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map2);
+            
+            // Get the search from prev screen intent
+            Bundle extras = getIntent().getExtras();
+            if (extras != null) {
+                searchString = extras.getString("_search");
+                setTitle("Search: "+ searchString);
+            }
 
             // Hide the single venue map view items
             LinearLayout ll = findViewById(R.id.appbar);
@@ -238,7 +243,9 @@ public class MapsActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                NavUtils.navigateUpFromSameTask(this);
+//                NavUtils.navigateUpFromSameTask(this);
+
+                finish();
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -333,6 +340,7 @@ public class MapsActivity extends AppCompatActivity
                             venuesList.get(i).getVenueURL()));
                     // Passes the crucial venue details onto the map view
                     intent.putExtra("venuesList", venueResults);
+                    intent.putExtra( "_search", searchString );
                     startActivity(intent);
                 }
             }
