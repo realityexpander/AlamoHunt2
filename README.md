@@ -1,4 +1,23 @@
-# AlamoHunt2
-initial commit
+# AlamoHunt
 
-This app searches for places using Foursquare's places API
+This app searches for places and recommendations using Foursquare's places API for Austin venues of 
+interest, such as Tacos. Displays ratings for each venue, distance from the center of Austin and
+ability to favorite any venue, which persists between use of the app.
+
+- Uses live autocomplete search in main screen dropdown menu
+- Main screen list shows venue details such as Distance from Austin
+- Shows map of all venues via a floating action button.
+- Map allows selection of individual venue
+- Each individual venue activity shows details of venue and allow to view on Foursquare site
+  or the website for the venue.
+- Uses collaping menu to show individual venue details
+- Properly adheres to android UI standards
+
+
+Refactors for version 2
+- possibly use only one kind of venue object for the Foursquare data and the internal data
+- Make UI prettier
+- Add more details to individual venue details activity
+- Using retrofit more efficiently
+  - Currently it loads a venue then must go get the details about each venue from a different endpoint
+  
