@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
         AutocompleteAdapter autoCompleteAdapter = new AutocompleteAdapter(this, R.layout.auto_complete_layout);
         searchTextView.setThreshold(3);
         searchTextView.setAdapter(autoCompleteAdapter);
-
         //when autocomplete search result is clicked
         searchTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -85,5 +84,5 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
+ 
 }
