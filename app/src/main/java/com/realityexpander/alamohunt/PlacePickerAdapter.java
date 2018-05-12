@@ -185,6 +185,8 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
 
     @Override
     public int getItemCount() {
+        if (results == null)
+            return 0;
         return results.size();
     }
 

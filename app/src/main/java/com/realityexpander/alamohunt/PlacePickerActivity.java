@@ -73,6 +73,13 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
     private ArrayList<Venue> venueResults;
 
 
+    // CDA scroll test
+    private int mScrollY;
+    private int mStateScrollY;
+    private double mStateOffset;
+    private int mStatePos;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +88,28 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             searchString = extras.getString("_search");
+        }
+
+        // The visible TextView and RecyclerView objects
+        placePicker = (RecyclerView)findViewById(R.id.placePickerList);
+        // Sets the dimensions, LayoutManager, and dividers for the RecyclerView
+        placePicker.setHasFixedSize(true);
+        placePickerManager = new LinearLayoutManager(this);
+        placePicker.setLayoutManager(placePickerManager);
+        placePicker.addItemDecoration(new DividerItemDecoration(placePicker.getContext(), placePickerManager.getOrientation()));
+
+        // CDA scroll test
+        RecyclerView.OnScrollListener mTotalScrollListener = new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                mScrollY += dy;
+            }
+        };
+
+        // Get saved instance data for orientation change
+        if (savedInstanceState != null && savedInstanceState.containsKey("frsResults")) {
+            frsResults = (ArrayList<FoursquareResults>)savedInstanceState.getSerializable("frsResults");
         }
 
         // Setup the toolbar UI elements
@@ -96,7 +125,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
         spinner = (ProgressBar)findViewById(R.id.progressBar1);
 
-        // The FAB shows all the venues on a map
+        // The FAB shows all the venues for the MapsActivity
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,6 +147,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                     String category;
                     String categoryIconURL;
 
+                    // Check for missing category
                     if (frsResults.get(n).venue.categories.size() == 0) {
                         category = "";
                         categoryIconURL = null;
@@ -134,12 +164,11 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                                                 frsResults.get(n).venue.location.lat,
                                                 frsResults.get(n).venue.location.lng,
                                                 categoryIconURL,
-                                      "https://foursquare.com/v/"+frsResults.get(n).venue.id  // CDA FIX -> Strings.xml
+                                      "https://foursquare.com/v/"+frsResults.get(n).venue.id  // CDA FIX -> Strings.xml?
                     ) );
                 }
                 // Passes the crucial venue details onto the map view
                 i.putExtra("venuesList", venueResults);
-                i.putExtra("frsResults", frsResults); // pass in the full results too (to be passed back from maps) // CDA FIX
                 i.putExtra("_search", searchString);
 
                 // Transitions to the map view.
@@ -147,15 +176,6 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
             }
         });
 
-
-        // The visible TextView and RecyclerView objects
-        placePicker = (RecyclerView)findViewById(R.id.placePickerList);
-
-        // Sets the dimensions, LayoutManager, and dividers for the RecyclerView
-        placePicker.setHasFixedSize(true);
-        placePickerManager = new LinearLayoutManager(this);
-        placePicker.setLayoutManager(placePickerManager);
-        placePicker.addItemDecoration(new DividerItemDecoration(placePicker.getContext(), placePickerManager.getOrientation()));
 
         // Creates a connection to the Google API for location services
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -173,16 +193,29 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
     @Override
     public void onConnected(Bundle connectionHint) {
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle("Search: " + searchString);
+
+        // Already loaded data from the Foursquare? (Orientation change/pop back from prev activity)
+        if (frsResults != null) {
+            spinner.setVisibility(View.GONE);
+            placePickerAdapter = new PlacePickerAdapter(getApplicationContext(), frsResults);
+            placePicker.setAdapter(placePickerAdapter); // CDA FIX - Anyway to force to scroll to last known position?
+
+            // CDA Scroll Test
+            LinearLayoutManager manager = (LinearLayoutManager) placePicker.getLayoutManager();
+            manager.scrollToPositionWithOffset(mStatePos, (int) mStateOffset);
+
+            return;
+        }
+
         // Checks for location permissions at runtime (required for API >= 23)
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
             // Makes a Google API request for the user's last known location
             Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
-            if (mLastLocation != null) {
-
-                Toolbar toolbar = findViewById(R.id.toolbar);
-                toolbar.setTitle("Search: " + searchString);
+            if (mLastLocation != null ) {
 
                 // ***
                 // Find venues matching the search criteria
@@ -328,6 +361,43 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
         // Disconnects from the Google API
         mGoogleApiClient.disconnect();
+
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save already loaded database records to the savedInstanceState.
+        // This bundle will be passed to onCreate if the process is
+        // killed and restarted.
+        savedInstanceState.putSerializable("frsResults", frsResults);
+
+        // CDA Test scroll
+        // Save the scroll state
+        LinearLayoutManager manager = (LinearLayoutManager) placePicker.getLayoutManager();
+        if ( manager != null) {
+            int firstItem = manager.findFirstVisibleItemPosition();
+            View firstItemView = manager.findViewByPosition(firstItem);
+            float topOffset = firstItemView.getTop();
+            savedInstanceState.putInt("scrollPosition", firstItem);
+            savedInstanceState.putFloat("scrollOffset", topOffset);
+        }
+
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        // Restore UI state from the savedInstanceState.
+        // This bundle has also been passed to onCreate.
+
+        frsResults = (ArrayList<FoursquareResults>)savedInstanceState.getSerializable("frsResults");
+
+        // CDA Test Scroll
+        mStatePos = savedInstanceState.getInt("scrollPosition");
+        mStateOffset = savedInstanceState.getFloat("scrollOffset");
+
     }
 
     @Override

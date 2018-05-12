@@ -200,8 +200,12 @@ public class MapsActivity extends AppCompatActivity
                     // FILL OUT THE VENUE DATA
                     tvVenueName.setText(fv.name);
                     tvVenueURL.setText(fv.url);
-                    tvVenueRating.setText("Rating: " + Double.toString(fv.rating) );
-                    tvVenueRating.setBackgroundColor(Color.parseColor("#" + fv.ratingColor));
+                    if (fv.rating > 0 ) {
+                        tvVenueRating.setText("Rating: " + Double.toString(fv.rating));
+                        if (fv.ratingColor != null)
+                            tvVenueRating.setBackgroundColor(Color.parseColor("#" + fv.ratingColor));
+                    } else
+                        tvVenueRating.setVisibility(View.INVISIBLE);
 
                     tvFoursquareWebsite.setText(fv.canonicalUrl);
                     tvLikesCount.setText("Likes: " + Integer.toString(fv.likes.count));
@@ -287,7 +291,6 @@ public class MapsActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case android.R.id.home:
 //                NavUtils.navigateUpFromSameTask(this);
-
                 finish();
                 return true;
         }

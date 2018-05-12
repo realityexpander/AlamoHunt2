@@ -23,7 +23,8 @@
         <activity
             android:name=".PlacePickerActivity"
             android:label="@string/title_activity_place_picker"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:configChanges="orientation|screenSize">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.realityexpander.alamohunt.MainActivity" />
