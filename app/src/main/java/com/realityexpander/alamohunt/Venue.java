@@ -89,9 +89,7 @@ public class Venue implements Serializable {
         this.longitude = longitude;
     }
     public void setMarker(Marker marker) {this.marker = marker;}
-    public void setCategoryIconURL(String categoryIconURL) {
-        this.categoryIconURL = categoryIconURL;
-    }
+    public void setCategoryIconURL(String categoryIconURL) {this.categoryIconURL = categoryIconURL;}
     public void setVenueURL(String venueURL) {this.venueURL = venueURL;}
 
 }

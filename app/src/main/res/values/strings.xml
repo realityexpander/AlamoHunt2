@@ -22,5 +22,6 @@
    <string name="search_button_name">Search</string>
     <string name="FoursquareIconTypeAndSize">bg_88</string>
     <string name="FoursquareIconURLPrefix">https://foursquare.com/v/</string>
+    <string name="Foursquare">bg_88</string>
 
 </resources>

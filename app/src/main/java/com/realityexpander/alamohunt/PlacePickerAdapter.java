@@ -139,8 +139,8 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
         holder.venueDetails.setLatitude(fv.location.lat);
         holder.venueDetails.setLongitude(fv.location.lng);
 
-
-        if (fv.categories.size() == 0 ) { // Missing the category name?
+        // Missing the category name?
+        if (fv.categories.size() == 0 ) {
             holder.category.setText("N/A");
             holder.venueDetails.setCategoryName("N/A");
             holder.venueDetails.setCategoryIconURL(null);
@@ -149,10 +149,13 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
             holder.venueDetails.setCategoryName(fv.categories.get(FIRST_CATEGORY).name);
             // Load the category icon
             holder.venueDetails.setCategoryIconURL(
-                    fv.categories.get(FIRST_CATEGORY).icon.prefix + "bg_88" + fv.categories.get(FIRST_CATEGORY).icon.suffix);
+                    fv.categories.get(FIRST_CATEGORY).icon.prefix
+                            + context.getString(R.string.FoursquareIconTypeAndSize)
+                            + fv.categories.get(FIRST_CATEGORY).icon.suffix);
         }
 
-        holder.venueDetails.setVenueURL("https://foursquare.com/v/"+fv.id); // CDA FIX refactor? do this calc in a func
+        // URL to foursquare website for venue
+        holder.venueDetails.setVenueURL(context.getString(R.string.foursquare_base_URL) + fv.id);
 
         // Set if favorited
         holder.ivFavorite.setVisibility(View.INVISIBLE); // defaults to invisible

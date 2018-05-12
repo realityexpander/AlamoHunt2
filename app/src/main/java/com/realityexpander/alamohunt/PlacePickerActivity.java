@@ -72,12 +72,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
     private ArrayList<FoursquareResults> frsResults;
     private ArrayList<Venue> venueResults;
 
-//    // Scroll list handling
-//    private int mScrollY;
-//    private int mStateScrollY;
-//    private double mStateOffset;
-//    private int mStatePos;
-
+    private static int FIRST_CATEGORY = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,7 +124,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                     return;
                 }
 
-                // Creates an intent to direct the user to a multi-venue map view
+                // Creates intent to direct the user to a multi-venue map view
                 Context context = getApplicationContext();
                 Intent i = new Intent(context, MapsActivity.class);
 
@@ -144,11 +139,11 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                         category = "";
                         categoryIconURL = null;
                     } else {
-                        category = frsResults.get(n).venue.categories.get(0).name;
+                        category = frsResults.get(n).venue.categories.get(FIRST_CATEGORY).name;
                         // Build the category icon url string
-                        categoryIconURL = frsResults.get(n).venue.categories.get(0).icon.prefix
+                        categoryIconURL = frsResults.get(n).venue.categories.get(FIRST_CATEGORY).icon.prefix
                                 + getString(R.string.FoursquareIconTypeAndSize)
-                                + frsResults.get(n).venue.categories.get(0).icon.suffix;
+                                + frsResults.get(n).venue.categories.get(FIRST_CATEGORY).icon.suffix;
                     }
 
                     venueResults.add(new Venue( frsResults.get(n).venue.name,
@@ -157,7 +152,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                                                 frsResults.get(n).venue.location.lat,
                                                 frsResults.get(n).venue.location.lng,
                                                 categoryIconURL,
-                                      getString(R.string.FoursquareIconURLPrefix)+frsResults.get(n).venue.id
+                                                getString(R.string.FoursquareIconURLPrefix)+frsResults.get(n).venue.id
                     ) );
                 }
                 // Passes the crucial venue details onto the map view
@@ -259,6 +254,9 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                             finish();
                             return;
                         }
+
+                        //***
+                        // GET THE FOURSQUARE RESPONSE
                         // Gets the venue object from the JSON response
                         FoursquareJSON fjson = response.body();
                         FoursquareResponse fr = fjson.response;
@@ -291,7 +289,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                                     @Override
                                     public void onResponse(Call<FoursquareJSON> call, Response<FoursquareJSON> response) {
 
-                                        // No response body? Prolly cuz quota exceeded
+                                        // No response body? Prolly cuz quota exceeded...
                                         if(response.body() == null) {
                                             try {
                                                 JSONObject jObjError = new JSONObject(response.errorBody().string());
