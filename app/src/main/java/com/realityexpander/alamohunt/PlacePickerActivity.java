@@ -72,6 +72,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
     private ArrayList<FoursquareResults> frsResults;
     private ArrayList<Venue> venueResults;
 
+    private static int FIRST_CATEGORY = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +82,20 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             searchString = extras.getString("_search");
+        }
+
+        // The visible TextView and RecyclerView objects
+        placePicker = (RecyclerView)findViewById(R.id.placePickerList);
+        // Sets the dimensions, LayoutManager, and dividers for the RecyclerView
+        placePicker.setHasFixedSize(true);
+        placePickerManager = new LinearLayoutManager(this);
+        placePicker.setLayoutManager(placePickerManager);
+        placePicker.addItemDecoration(new DividerItemDecoration(placePicker.getContext(), placePickerManager.getOrientation()));
+
+
+        // Get saved instance data for orientation change
+        if (savedInstanceState != null && savedInstanceState.containsKey("frsResults")) {
+            frsResults = (ArrayList<FoursquareResults>)savedInstanceState.getSerializable("frsResults");
         }
 
         // Setup the toolbar UI elements
@@ -96,19 +111,20 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
         spinner = (ProgressBar)findViewById(R.id.progressBar1);
 
-        // The FAB shows all the venues on a map
+
+        // The FAB shows all the venues for the MapsActivity
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                if(frsResults == null) {
+                if(frsResults == null) { // User clicked FAB too fast, should prolly just ignore it, but we will give a message
                         Snackbar.make(view, "One moment... data is loading", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                     return;
                 }
 
-                // Creates an intent to direct the user to a multi-venue map view
+                // Creates intent to direct the user to a multi-venue map view
                 Context context = getApplicationContext();
                 Intent i = new Intent(context, MapsActivity.class);
 
@@ -118,14 +134,16 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                     String category;
                     String categoryIconURL;
 
+                    // Check for missing category
                     if (frsResults.get(n).venue.categories.size() == 0) {
                         category = "";
                         categoryIconURL = null;
                     } else {
-                        category = frsResults.get(n).venue.categories.get(0).name;
-                        categoryIconURL = frsResults.get(n).venue.categories.get(0).icon.prefix
-                                + "bg_88" // CDA FIX todo - Make constant FOURSQUARE_ICON_SIZE
-                                + frsResults.get(n).venue.categories.get(0).icon.suffix;
+                        category = frsResults.get(n).venue.categories.get(FIRST_CATEGORY).name;
+                        // Build the category icon url string
+                        categoryIconURL = frsResults.get(n).venue.categories.get(FIRST_CATEGORY).icon.prefix
+                                + getString(R.string.FoursquareIconTypeAndSize)
+                                + frsResults.get(n).venue.categories.get(FIRST_CATEGORY).icon.suffix;
                     }
 
                     venueResults.add(new Venue( frsResults.get(n).venue.name,
@@ -134,12 +152,11 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                                                 frsResults.get(n).venue.location.lat,
                                                 frsResults.get(n).venue.location.lng,
                                                 categoryIconURL,
-                                      "https://foursquare.com/v/"+frsResults.get(n).venue.id  // CDA FIX -> Strings.xml
+                                                getString(R.string.FoursquareIconURLPrefix)+frsResults.get(n).venue.id
                     ) );
                 }
                 // Passes the crucial venue details onto the map view
                 i.putExtra("venuesList", venueResults);
-                i.putExtra("frsResults", frsResults); // pass in the full results too (to be passed back from maps) // CDA FIX
                 i.putExtra("_search", searchString);
 
                 // Transitions to the map view.
@@ -147,15 +164,6 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
             }
         });
 
-
-        // The visible TextView and RecyclerView objects
-        placePicker = (RecyclerView)findViewById(R.id.placePickerList);
-
-        // Sets the dimensions, LayoutManager, and dividers for the RecyclerView
-        placePicker.setHasFixedSize(true);
-        placePickerManager = new LinearLayoutManager(this);
-        placePicker.setLayoutManager(placePickerManager);
-        placePicker.addItemDecoration(new DividerItemDecoration(placePicker.getContext(), placePickerManager.getOrientation()));
 
         // Creates a connection to the Google API for location services
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -173,18 +181,47 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
     @Override
     public void onConnected(Bundle connectionHint) {
 
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar.setTitle("Search: " + searchString);
+
+        // Already loaded data from the Foursquare? (Orientation change/nav back from prev activity)
+        if (frsResults != null) {
+            spinner.setVisibility(View.GONE);
+
+            // Save the scroll position
+            boolean resetScroll = false;
+            int firstItem = 0;
+            float topOffset = 0;
+            LinearLayoutManager manager=null;
+            if (placePicker != null) {
+                manager = (LinearLayoutManager) placePicker.getLayoutManager();
+                firstItem = manager.findFirstVisibleItemPosition();
+                View firstItemView = manager.findViewByPosition(firstItem);
+                if(firstItemView!=null) {
+                    topOffset = firstItemView.getTop();
+                    resetScroll = true;
+                }
+            }
+            placePickerAdapter = new PlacePickerAdapter(getApplicationContext(), frsResults);
+            placePicker.setAdapter(placePickerAdapter);
+
+            // Reset the scroll after updating the placePickerAdapter
+            if (resetScroll)
+                manager.scrollToPositionWithOffset(firstItem, (int) topOffset);
+
+            return;
+        }
+
         // Checks for location permissions at runtime (required for API >= 23)
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
 
             // Makes a Google API request for the user's last known location
             Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
-            if (mLastLocation != null) {
-
-                Toolbar toolbar = findViewById(R.id.toolbar);
-                toolbar.setTitle("Search: " + searchString);
+            if (mLastLocation != null ) {
 
                 // ***
+                // SEARCH FOR VENUES
                 // Find venues matching the search criteria
                 // Builds Retrofit and FoursquareService objects for calling the Foursquare API and parsing with GSON
                 Retrofit retrofit = new Retrofit.Builder()
@@ -217,6 +254,9 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                             finish();
                             return;
                         }
+
+                        // ***
+                        // GET THE FOURSQUARE RESPONSE
                         // Gets the venue object from the JSON response
                         FoursquareJSON fjson = response.body();
                         FoursquareResponse fr = fjson.response;
@@ -232,6 +272,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                         spinner.setVisibility(View.GONE);
 
                         // ***
+                        // GET THE RATINGS FOR EACH VENUE
                         // Go thru each of the venues and get the ratings with another call to /venues/VENUE_ID
                         // for venues[0..n], Get the rating & rating color.
                         // Fill in frs.rating with the rating from /venues/VENUE_ID endpoint
@@ -248,6 +289,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                                     @Override
                                     public void onResponse(Call<FoursquareJSON> call, Response<FoursquareJSON> response) {
 
+                                        // No response body? Prolly cuz quota exceeded...
                                         if(response.body() == null) {
                                             try {
                                                 JSONObject jObjError = new JSONObject(response.errorBody().string());
@@ -298,7 +340,6 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                                 finish();
                             }
                         }
-
                     }
 
                     @Override
@@ -328,6 +369,25 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
         // Disconnects from the Google API
         mGoogleApiClient.disconnect();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Save already loaded database records to the savedInstanceState.
+        // This bundle will be passed to onCreate if the process is
+        // killed and restarted.
+        savedInstanceState.putSerializable("frsResults", frsResults);
+
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        // Restore UI state from the savedInstanceState.
+        // This bundle has also been passed to onCreate.
+
+        frsResults = (ArrayList<FoursquareResults>)savedInstanceState.getSerializable("frsResults");
     }
 
     @Override

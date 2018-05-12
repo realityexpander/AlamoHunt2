@@ -21,7 +21,7 @@
 
     <TextView
         android:id="@+id/placePickerItemName"
-        android:layout_width="wrap_content"
+        android:layout_width="248dp"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_alignTop="@+id/placePickerItemRating"
@@ -77,9 +77,10 @@
         android:id="@+id/placePickerFavorite"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/placePickerItemName"
+        android:layout_alignParentEnd="true"
+        android:layout_alignTop="@+id/placePickerCategoryIcon"
+        android:layout_marginRight="50dp"
         android:layout_marginTop="-5dp"
-        android:layout_toEndOf="@+id/placePickerItemName"
         android:visibility="invisible"
         app:srcCompat="@android:drawable/btn_star_big_on" />
 
