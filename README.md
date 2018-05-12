@@ -13,6 +13,11 @@ ability to favorite any venue, which persists between use of the app.
 - Uses collaping menu to show individual venue details
 - Properly adheres to android UI standards
 
+APIs & Libraries
+- Picasso for async image loading
+- Lottie for animation
+- Retrofit for async endpoint loading and forming queries
+
 
 Refactors for version 2
 - possibly use only one kind of venue object for the Foursquare data and the internal data
@@ -20,4 +25,5 @@ Refactors for version 2
 - Add more details to individual venue details activity
 - Using retrofit more efficiently
   - Currently it loads a venue then must go get the details about each venue from a different endpoint
+  - There may be a better way to do this
   
