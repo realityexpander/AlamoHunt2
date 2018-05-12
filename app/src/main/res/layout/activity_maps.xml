@@ -47,13 +47,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="8dp"
+        android:src="@android:drawable/btn_star_big_on"
         android:visibility="visible"
         app:borderWidth="0dp"
         app:elevation="5dp"
         app:fabSize="normal"
         app:layout_anchor="@+id/appbar"
-        app:layout_anchorGravity="bottom|center"
-        android:src="@android:drawable/btn_star_big_on" />
+        app:layout_anchorGravity="bottom|center" />
 
     <android.support.v4.widget.NestedScrollView
         android:id="@+id/nestedScrollView"
@@ -64,50 +64,145 @@
         app:layout_anchorGravity="bottom"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/tvCategoryName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="50dp"
-                android:text="Banking"
-                android:textStyle="bold"
-                tools:textColor="@color/cast_expanded_controller_background_color" />
-
             <ImageView
                 android:id="@+id/ivCategoryIcon"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginStart="50dp"
-                android:layout_marginBottom="10dp"
-                android:adjustViewBounds="true"
-                android:contentDescription="@string/mr_user_route_category_name"
+                android:layout_width="59dp"
+                android:layout_height="59dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginTop="25dp"
+                android:padding="8dp"
+                android:scaleType="fitXY"
                 android:visibility="visible"
                 app:srcCompat="@drawable/cast_ic_notification_stop_live_stream" />
 
             <TextView
-                android:id="@+id/tvFoursquareWebsite"
-                android:layout_width="match_parent"
+                android:id="@+id/tvVenueName"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentStart="true"
-                android:layout_marginBottom="10dp"
-                android:layout_marginStart="50dp"
-                android:autoLink="web"
-                android:text="http://foursquare.com"
-                android:textStyle="bold"
-                tools:textColor="@color/cast_expanded_controller_background_color" />
+                android:layout_alignTop="@+id/ivCategoryIcon"
+                android:layout_toEndOf="@id/ivCategoryIcon"
+                android:text="Venue Name"
+                android:textSize="30dp"
+                tools:textColor="@color/black" />
 
-        </LinearLayout>
+            <TextView
+                android:id="@+id/tvFoursquareWebsite"
+                android:layout_width="314dp"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/tvVenueName"
+                android:layout_alignLeft="@id/tvVenueName"
+                android:layout_marginBottom="-40dp"
+                android:autoLink="web"
+                android:maxLines="1"
+                android:text="http://www.venue.com"
+                android:textSize="20dp"
+                tools:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/tvCategoryName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/tvVenueName"
+                android:layout_alignTop="@+id/tvFoursquareWebsite"
+                android:layout_marginTop="40dp"
+                android:text="Category Name"
+                android:textSize="20dp"
+                tools:textColor="@color/cardview_dark_background" />
+
+
+            <TextView
+                android:id="@+id/tvFoursquareRating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/tvVenueName"
+                android:layout_alignTop="@+id/tvCategoryName"
+                android:layout_marginTop="40dp"
+                android:paddingBottom="2dp"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingTop="2dp"
+                android:text="Rating"
+                android:textSize="20dp"
+                tools:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/tvLikesCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/tvVenueName"
+                android:layout_alignTop="@+id/tvFoursquareRating"
+                android:layout_marginTop="40dp"
+                android:text="Likes: 250"
+                android:textSize="20dp"
+                tools:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/tvPhoneNumber"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/tvVenueName"
+                android:layout_alignTop="@+id/tvLikesCount"
+                android:layout_marginTop="40dp"
+                android:autoLink="phone"
+                android:text="(512) 555-1212"
+                tools:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/tvFacebookUsername"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/tvVenueName"
+                android:layout_alignTop="@+id/tvPhoneNumber"
+                android:layout_marginTop="40dp"
+                android:text="veracruztacos"
+                tools:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/tvMenuUrl"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/tvVenueName"
+                android:layout_alignTop="@+id/tvFacebookUsername"
+                android:layout_marginTop="40dp"
+                android:autoLink="web"
+                android:text="Menu"
+                tools:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/tvAddress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/tvVenueName"
+                android:layout_alignTop="@+id/tvMenuUrl"
+                android:layout_marginTop="40dp"
+                android:text="Address"
+                tools:textColor="@color/black" />
+
+            <TextView
+                android:id="@+id/tvFoursquarePrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignTop="@+id/tvFoursquareRating"
+                android:layout_marginEnd="122dp"
+                android:text="Price: $" />
+
+            <TextView
+                android:id="@+id/tvFoursquareHours"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/tvFoursquarePrice"
+                android:layout_alignTop="@+id/tvFoursquarePrice"
+                android:layout_marginTop="20dp"
+                android:text="Closed until 6:00 AM tomorrow"
+                tools:textColor="@color/black" />
+
+        </RelativeLayout>
 
     </android.support.v4.widget.NestedScrollView>
 
@@ -116,7 +211,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:visibility="invisible"
+        android:visibility="gone"
         app:layout_anchor="@+id/multiVenueMap"
         app:layout_anchorGravity="left|bottom">
 

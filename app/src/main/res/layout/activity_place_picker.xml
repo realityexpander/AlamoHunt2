@@ -44,6 +44,7 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginTop="57dp"
+        tools:listitem="@layout/item_place_picker"
         android:clipToPadding="false">
     </android.support.v7.widget.RecyclerView>
 
@@ -62,8 +63,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
+        app:elevation="10dp"
+        app:fabSize="normal"
         app:srcCompat="@android:drawable/ic_dialog_email" />
 
 </android.support.design.widget.CoordinatorLayout>
-
-    <!--<include layout="@layout/content_place_picker" />-->

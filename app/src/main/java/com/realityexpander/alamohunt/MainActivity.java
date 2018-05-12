@@ -68,14 +68,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        searchTextView.setOnDismissListener(new AutoCompleteTextView.OnDismissListener() {
-//            @Override
-//            public void onDismiss() {
-//                InputMethodManager in = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//                in.hideSoftInputFromWindow(getCurrentFocus().getApplicationWindowToken(), 0);
-//            }
-//        });
-
+        // When keyboard clicks enter or search button
         searchTextView.setImeOptions(EditorInfo.IME_ACTION_SEARCH);
         searchTextView.setOnEditorActionListener(new AutoCompleteTextView.OnEditorActionListener() {
             @Override

@@ -27,7 +27,7 @@ public interface FoursquareService {
                                             @Query("client_secret") String clientSecret,
                                             @Query("query") String autoCompleteString      );
 
-    // Request venue information
+    // Request individual venue information
     @GET("venues/{venue_id}?v=20161101")
     Call<FoursquareJSON> searchVenueID( @Path("venue_id") String venueID,
                                         @Query("client_id") String clientID,

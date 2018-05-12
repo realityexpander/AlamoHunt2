@@ -5,6 +5,7 @@
     <color name="colorAccent">#FF4081</color>
     <color name="white">#FFFFFF</color>
     <color name="whiteFaded">#E8FFFFFF</color>
+    <color name="black">#000000</color>
 
     <!-- Referenced from the Foursquare Brand Guide: https://foursquare.com/about/logos -->
     <color name="FSQStrawberry">#E6092C</color>

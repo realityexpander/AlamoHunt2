@@ -20,6 +20,7 @@ package com.realityexpander.alamohunt;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -100,22 +101,33 @@ public class MapsActivity extends AppCompatActivity
             LinearLayout ll = findViewById(R.id.multiVenueMap);
             ll.setVisibility(GONE);
 
-            // *** FILL IN DETAILS OF VENUE
+            // *** FILL IN BASIC DETAILS OF VENUE
             // Fill in data field views for Single venue details
-            final Venue cv = venuesList.get(CURRENT_VENUE); // current venue
+            final Venue cv = venuesList.get(CURRENT_VENUE); // current venue from picker
 
             ImageView ivCategoryIcon = (ImageView) findViewById(R.id.ivCategoryIcon);
             if ( cv.getCategoryIconURL() != null)
                 Picasso.with(getApplicationContext()).load(cv.getCategoryIconURL()).into(ivCategoryIcon);
 
-            TextView tvCategoryName = (TextView) findViewById(R.id.tvCategoryName);
+            final TextView tvVenueName = (TextView) findViewById(R.id.tvVenueName);
+            tvVenueName.setText(cv.getName());
+            final TextView tvCategoryName = (TextView) findViewById(R.id.tvCategoryName);
             tvCategoryName.setText(cv.getCategoryName());
-
             final TextView tvVenueURL = (TextView) findViewById(R.id.tvFoursquareWebsite);
             tvVenueURL.setText(cv.getVenueURL());
+            final TextView tvVenueRating = (TextView) findViewById(R.id.tvFoursquareRating);
+            tvVenueURL.setText(cv.getVenueURL());
+
+            final TextView tvFoursquareWebsite = (TextView) findViewById(R.id.tvFoursquareWebsite);
+            final TextView tvLikesCount = (TextView) findViewById(R.id.tvLikesCount);
+            final TextView tvPhoneNumber = (TextView) findViewById(R.id.tvPhoneNumber);
+            final TextView tvFacebookUsername = (TextView) findViewById(R.id.tvFacebookUsername);
+            final TextView tvMenuUrl = (TextView) findViewById(R.id.tvMenuUrl);
+            final TextView tvAddress = (TextView) findViewById(R.id.tvAddress);
+            final TextView tvFoursquarePrice = (TextView) findViewById(R.id.tvFoursquarePrice);
+            final TextView tvFoursquareHours = (TextView) findViewById(R.id.tvFoursquareHours);
 
             setTitle(venuesList.get(CURRENT_VENUE).getName());
-
 
             // *** LOAD PREFS
             // Load preferences (Favorite venue ID's)
@@ -123,7 +135,7 @@ public class MapsActivity extends AppCompatActivity
             if (favoriteVenueIDs == null)
                 favoriteVenueIDs = new ArrayList<>();
 
-            // *** FAB
+            // *** FAB behavior
             // The FAB favorites the venue true/false
             final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
             fab.setImageResource(android.R.drawable.star_big_off); // default to off
@@ -184,8 +196,39 @@ public class MapsActivity extends AppCompatActivity
                     FoursquareResponse fr = fjson.response;
                     FoursquareVenue fv = fr.venue;
 
+                    // ***
                     // FILL OUT THE VENUE DATA
-                    tvVenueURL.setText(Double.toString(fv.rating)); // CDA FIX add more details
+                    tvVenueName.setText(fv.name);
+                    tvVenueURL.setText(fv.url);
+                    tvVenueRating.setText("Rating: " + Double.toString(fv.rating) );
+                    tvVenueRating.setBackgroundColor(Color.parseColor("#" + fv.ratingColor));
+
+                    tvFoursquareWebsite.setText(fv.canonicalUrl);
+                    tvLikesCount.setText("Likes: " + Integer.toString(fv.likes.count));
+                    tvPhoneNumber.setText(fv.contact.formattedPhone);
+                    if(fv.contact.facebookUsername != null)
+                        tvFacebookUsername.setText("Facebook: " + fv.contact.facebookUsername);
+                    else
+                        tvFacebookUsername.setVisibility(GONE);
+                    if (fv.menu!=null)
+                        tvMenuUrl.setText(fv.menu.mobileUrl);
+                    else
+                        tvMenuUrl.setVisibility(GONE);
+                    if(fv.location.formattedAddress.size()>0) {
+                        String address="";
+                        for(int i=0; i<fv.location.formattedAddress.size(); i++) // Get each line of formatted address
+                            address +=  fv.location.formattedAddress.get(i) + "\n";
+                        tvAddress.setText(address);
+                    }
+                    if ( fv.price != null ) {
+                        tvFoursquarePrice.setText(fv.price.message + " " + fv.price.currency);
+                    }
+                    else
+                        tvFoursquarePrice.setVisibility(View.INVISIBLE);
+                    if (fv.hours != null)
+                        tvFoursquareHours.setText(fv.hours.status);
+                    else
+                        tvFoursquareHours.setVisibility(GONE);
                 }
 
                 @Override
@@ -296,8 +339,12 @@ public class MapsActivity extends AppCompatActivity
         LatLngBounds bounds = builder.build();
 
         // Zoom Fudge factor for single venue height layout // CDA todo fix this to reflect view size for map from resources
-        if(venuesList.size()==1)
-            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h/3, 250));
+        if(venuesList.size()==1) {
+             if( w > h)
+                 mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, 400));
+            else
+                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h/2, 450));
+        }
         else
             mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, padding));
 
