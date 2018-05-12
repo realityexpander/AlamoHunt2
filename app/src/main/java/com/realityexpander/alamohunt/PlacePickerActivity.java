@@ -118,7 +118,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
             @Override
             public void onClick(View view) {
 
-                if(frsResults == null) {
+                if(frsResults == null) { // User clicked FAB too fast, should prolly just ignore it, but we will give a message
                         Snackbar.make(view, "One moment... data is loading", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
                     return;
@@ -205,7 +205,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
             placePickerAdapter = new PlacePickerAdapter(getApplicationContext(), frsResults);
             placePicker.setAdapter(placePickerAdapter);
 
-            // Reset the scroll after updating the placePickerAdapter // CDA todo is there a better way to do this?
+            // Reset the scroll after updating the placePickerAdapter
             if (resetScroll)
                 manager.scrollToPositionWithOffset(firstItem, (int) topOffset);
 
@@ -255,7 +255,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                             return;
                         }
 
-                        //***
+                        // ***
                         // GET THE FOURSQUARE RESPONSE
                         // Gets the venue object from the JSON response
                         FoursquareJSON fjson = response.body();
@@ -340,7 +340,6 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                                 finish();
                             }
                         }
-
                     }
 
                     @Override
