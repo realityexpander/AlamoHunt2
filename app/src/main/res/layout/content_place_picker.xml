@@ -9,5 +9,4 @@
     tools:showIn="@layout/activity_place_picker">
 
 
-
 </android.support.constraint.ConstraintLayout>

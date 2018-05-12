@@ -33,6 +33,13 @@ public class FoursquareVenue implements Serializable {
     List<FoursquareCategories> categories = new ArrayList<FoursquareCategories>();
 
     String url;
+    String canonicalUrl;
+
+    FoursquareLikes likes;
+
+    FoursquareMenu menu;
+
+    FoursquarePrice price;
 
     FoursquareHours hours;
 
