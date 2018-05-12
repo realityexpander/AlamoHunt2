@@ -10,16 +10,19 @@
     <!--<string name="foursquare_client_id">RHC4PG23A5ICWD4HT1VGW21MVBZEW42LXP34EE4P1HGBKUVN</string>-->
     <!--<string name="foursquare_client_secret">SAE30GFO1QPOVUMHLH0UVGFA2RGZWC0GSSEFW1OBMP1VG4QA</string>-->
 
-    <string name="foursquare_client_id">0RJ55P5RUYMZ3F33PAYM3P5OLWGQTTHMZQGZL2PLHFKVOSYU</string>
-    <string name="foursquare_client_secret">DXBX2ZXXT50JJJKR023PDDQINBVN3TT1IS4RRKP1YSMEKTLJ</string>
+    <!--<string name="foursquare_client_id">0RJ55P5RUYMZ3F33PAYM3P5OLWGQTTHMZQGZL2PLHFKVOSYU</string>-->
+    <!--<string name="foursquare_client_secret">DXBX2ZXXT50JJJKR023PDDQINBVN3TT1IS4RRKP1YSMEKTLJ</string>    -->
+
+    <string name="foursquare_client_id">LA0IWPQ4HFVYQ0F3J2GUMPQMGOXHTLIGNRVODVIYIBTT40O0</string>
+    <string name="foursquare_client_secret">IMDQ1OOJZ2ADVKLYEQTVSVMXMLSK53N4BWGO1K3F30O0LXIT</string>
 
     <!--<string name="foursquare_client_id">LLFAVAC1I3GFDR2B5DOGJJDA2TTPLJ4IVJCQQBXD2JBPFL3J</string>-->
-   <!--<string name="foursquare_client_secret">NFVXRLXINTZZK31IEBXAGSJJCIXKMM3MIIYHMYMGKSALOSBU</string>-->
+    <!--<string name="foursquare_client_secret">NFVXRLXINTZZK31IEBXAGSJJCIXKMM3MIIYHMYMGKSALOSBU</string>-->
 
-   <string name="foursquare_base_URL">"https://api.foursquare.com/v2/"</string>
-   <string name="title_activity_view_venue">ViewVenueActivity</string>
-   <string name="search_bar_default_text">Search Austin</string>
-   <string name="search_button_name">Search</string>
+    <string name="foursquare_base_URL">"https://api.foursquare.com/v2/"</string>
+    <string name="title_activity_view_venue">ViewVenueActivity</string>
+    <string name="search_bar_default_text">Search Austin</string>
+    <string name="search_button_name">Search</string>
     <string name="FoursquareIconTypeAndSize">bg_88</string>
     <string name="FoursquareIconURLPrefix">https://foursquare.com/v/</string>
     <string name="Foursquare">bg_88</string>
