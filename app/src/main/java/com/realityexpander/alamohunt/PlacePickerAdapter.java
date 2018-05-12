@@ -79,7 +79,7 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
 
             // Creates an intent to direct the user to the single venue map view
             Context context = name.getContext();
-             Intent i = new Intent(context, MapsActivity.class);
+            Intent i = new Intent(context, MapsActivity.class);
 
             // Build the one-item venue list
             // Passes the crucial venue details onto the map view

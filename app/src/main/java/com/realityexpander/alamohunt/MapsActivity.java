@@ -47,6 +47,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONObject;
+
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
@@ -191,48 +193,60 @@ public class MapsActivity extends AppCompatActivity
                 @Override
                 public void onResponse(Call<FoursquareJSON> call, Response<FoursquareJSON> response) {
 
-                    // Gets the venue object from the JSON response
-                    FoursquareJSON fjson = response.body();
-                    FoursquareResponse fr = fjson.response;
-                    FoursquareVenue fv = fr.venue;
+                        // Gets the venue object from the JSON response
+                        FoursquareJSON fjson = response.body();
 
-                    // ***
-                    // FILL OUT THE VENUE DATA
-                    tvVenueName.setText(fv.name);
-                    tvVenueURL.setText(fv.url);
-                    if (fv.rating > 0 ) {
-                        tvVenueRating.setText("Rating: " + Double.toString(fv.rating));
-                        if (fv.ratingColor != null)
-                            tvVenueRating.setBackgroundColor(Color.parseColor("#" + fv.ratingColor));
-                    } else
-                        tvVenueRating.setVisibility(View.INVISIBLE);
+                        if(response.body() == null) { // no data from server?
+                            try {
+                                // pull error code from foursquare response
+                                JSONObject jObjError = new JSONObject(response.errorBody().string());
+                                Toast.makeText(getApplicationContext(), ((JSONObject)jObjError.get("meta")).getString("errorDetail"), Toast.LENGTH_LONG).show();
+                            } catch (Exception e) {
+                                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
+                            }
+                            return;
+                        }
 
-                    tvFoursquareWebsite.setText(fv.canonicalUrl);
-                    tvLikesCount.setText("Likes: " + Integer.toString(fv.likes.count));
-                    tvPhoneNumber.setText(fv.contact.formattedPhone);
-                    if(fv.contact.facebookUsername != null)
-                        tvFacebookUsername.setText("Facebook: " + fv.contact.facebookUsername);
-                    else
-                        tvFacebookUsername.setVisibility(GONE);
-                    if (fv.menu!=null)
-                        tvMenuUrl.setText(fv.menu.mobileUrl);
-                    else
-                        tvMenuUrl.setVisibility(GONE);
-                    if(fv.location.formattedAddress.size()>0) {
-                        String address="";
-                        for(int i=0; i<fv.location.formattedAddress.size(); i++) // Get each line of formatted address
-                            address +=  fv.location.formattedAddress.get(i) + "\n";
-                        tvAddress.setText(address);
-                    }
-                    if ( fv.price != null ) {
-                        tvFoursquarePrice.setText(fv.price.message + " " + fv.price.currency);
-                    }
-                    else
-                        tvFoursquarePrice.setVisibility(View.INVISIBLE);
-                    if (fv.hours != null)
-                        tvFoursquareHours.setText(fv.hours.status);
-                    else
-                        tvFoursquareHours.setVisibility(GONE);
+                        FoursquareResponse fr = fjson.response;
+                        FoursquareVenue fv = fr.venue;
+
+                        // ***
+                        // FILL OUT THE VENUE DATA
+                        tvVenueName.setText(fv.name);
+                        tvVenueURL.setText(fv.url);
+                        if (fv.rating > 0) {
+                            tvVenueRating.setText("Rating: " + Double.toString(fv.rating));
+                            if (fv.ratingColor != null)
+                                tvVenueRating.setBackgroundColor(Color.parseColor("#" + fv.ratingColor));
+                        } else
+                            tvVenueRating.setVisibility(View.INVISIBLE);
+
+                        tvFoursquareWebsite.setText(fv.canonicalUrl);
+                        tvLikesCount.setText("Likes: " + Integer.toString(fv.likes.count));
+                        tvPhoneNumber.setText(fv.contact.formattedPhone);
+                        if (fv.contact.facebookUsername != null)
+                            tvFacebookUsername.setText("Facebook: " + fv.contact.facebookUsername);
+                        else
+                            tvFacebookUsername.setVisibility(GONE);
+                        if (fv.menu != null)
+                            tvMenuUrl.setText(fv.menu.mobileUrl);
+                        else
+                            tvMenuUrl.setVisibility(GONE);
+                        if (fv.location.formattedAddress.size() > 0) {
+                            String address = "";
+                            for (int i = 0; i < fv.location.formattedAddress.size(); i++) // Get each line of formatted address
+                                address += fv.location.formattedAddress.get(i) + "\n";
+                            tvAddress.setText(address);
+                        }
+                        if (fv.price != null) {
+                            tvFoursquarePrice.setText(fv.price.message + " " + fv.price.currency);
+                        } else
+                            tvFoursquarePrice.setVisibility(View.INVISIBLE);
+                        if (fv.hours != null)
+                            tvFoursquareHours.setText(fv.hours.status);
+                        else
+                            tvFoursquareHours.setVisibility(GONE);
+
                 }
 
                 @Override

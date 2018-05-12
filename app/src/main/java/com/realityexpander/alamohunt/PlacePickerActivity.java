@@ -99,6 +99,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         placePicker.addItemDecoration(new DividerItemDecoration(placePicker.getContext(), placePickerManager.getOrientation()));
 
         // CDA scroll test
+        // Monitor the scroll position
         RecyclerView.OnScrollListener mTotalScrollListener = new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -124,6 +125,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         });
 
         spinner = (ProgressBar)findViewById(R.id.progressBar1);
+
 
         // The FAB shows all the venues for the MapsActivity
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -199,12 +201,29 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         // Already loaded data from the Foursquare? (Orientation change/pop back from prev activity)
         if (frsResults != null) {
             spinner.setVisibility(View.GONE);
+
+            boolean resetScroll = false;
+            int firstItem = 0;
+            float topOffset = 0;
+            LinearLayoutManager manager=null;
+            if (placePicker != null) {
+                manager = (LinearLayoutManager) placePicker.getLayoutManager();
+                firstItem = manager.findFirstVisibleItemPosition();
+                View firstItemView = manager.findViewByPosition(firstItem);
+                if(firstItemView!=null) {
+                    topOffset = firstItemView.getTop();
+                    resetScroll = true;
+                }
+            }
+
             placePickerAdapter = new PlacePickerAdapter(getApplicationContext(), frsResults);
             placePicker.setAdapter(placePickerAdapter); // CDA FIX - Anyway to force to scroll to last known position?
 
             // CDA Scroll Test
-            LinearLayoutManager manager = (LinearLayoutManager) placePicker.getLayoutManager();
-            manager.scrollToPositionWithOffset(mStatePos, (int) mStateOffset);
+//            LinearLayoutManager manager = (LinearLayoutManager) placePicker.getLayoutManager();
+            if (resetScroll)
+                manager.scrollToPositionWithOffset(firstItem, (int) topOffset);
+//            manager.scrollToPositionWithOffset(mStatePos, (int) mStateOffset);
 
             return;
         }
@@ -361,8 +380,6 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
         // Disconnects from the Google API
         mGoogleApiClient.disconnect();
-
-
     }
 
     @Override
@@ -395,6 +412,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         frsResults = (ArrayList<FoursquareResults>)savedInstanceState.getSerializable("frsResults");
 
         // CDA Test Scroll
+        // Restore the scroll state
         mStatePos = savedInstanceState.getInt("scrollPosition");
         mStateOffset = savedInstanceState.getFloat("scrollOffset");
 
