@@ -22,7 +22,7 @@
     <string name="foursquare_base_URL">"https://api.foursquare.com/v2/"</string>
     <string name="title_activity_view_venue">ViewVenueActivity</string>
     <string name="search_bar_default_text">Search Austin</string>
-    <string name="search_button_name">Search</string>
+    <string name="search_button_name">Search Austin</string>
     <string name="FoursquareIconTypeAndSize">bg_88</string>
     <string name="FoursquareIconURLPrefix">https://foursquare.com/v/</string>
     <string name="Foursquare">bg_88</string>
