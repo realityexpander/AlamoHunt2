@@ -360,7 +360,7 @@ public class MapsActivity extends AppCompatActivity
              if( w > h)
                  mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, 400));
             else
-                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h/2, 450));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, 400));
         }
         else
             mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, padding));
