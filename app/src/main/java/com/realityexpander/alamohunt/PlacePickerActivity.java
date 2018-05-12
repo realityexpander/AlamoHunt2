@@ -72,12 +72,11 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
     private ArrayList<FoursquareResults> frsResults;
     private ArrayList<Venue> venueResults;
 
-
-    // CDA scroll test
-    private int mScrollY;
-    private int mStateScrollY;
-    private double mStateOffset;
-    private int mStatePos;
+//    // Scroll list handling
+//    private int mScrollY;
+//    private int mStateScrollY;
+//    private double mStateOffset;
+//    private int mStatePos;
 
 
     @Override
@@ -98,15 +97,6 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         placePicker.setLayoutManager(placePickerManager);
         placePicker.addItemDecoration(new DividerItemDecoration(placePicker.getContext(), placePickerManager.getOrientation()));
 
-        // CDA scroll test
-        // Monitor the scroll position
-        RecyclerView.OnScrollListener mTotalScrollListener = new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                mScrollY += dy;
-            }
-        };
 
         // Get saved instance data for orientation change
         if (savedInstanceState != null && savedInstanceState.containsKey("frsResults")) {
@@ -155,8 +145,9 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                         categoryIconURL = null;
                     } else {
                         category = frsResults.get(n).venue.categories.get(0).name;
+                        // Build the category icon url string
                         categoryIconURL = frsResults.get(n).venue.categories.get(0).icon.prefix
-                                + "bg_88" // CDA FIX todo - Make constant FOURSQUARE_ICON_SIZE
+                                + getString(R.string.FoursquareIconTypeAndSize)
                                 + frsResults.get(n).venue.categories.get(0).icon.suffix;
                     }
 
@@ -166,7 +157,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                                                 frsResults.get(n).venue.location.lat,
                                                 frsResults.get(n).venue.location.lng,
                                                 categoryIconURL,
-                                      "https://foursquare.com/v/"+frsResults.get(n).venue.id  // CDA FIX -> Strings.xml?
+                                      getString(R.string.FoursquareIconURLPrefix)+frsResults.get(n).venue.id
                     ) );
                 }
                 // Passes the crucial venue details onto the map view
@@ -198,10 +189,11 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Search: " + searchString);
 
-        // Already loaded data from the Foursquare? (Orientation change/pop back from prev activity)
+        // Already loaded data from the Foursquare? (Orientation change/nav back from prev activity)
         if (frsResults != null) {
             spinner.setVisibility(View.GONE);
 
+            // Save the scroll position
             boolean resetScroll = false;
             int firstItem = 0;
             float topOffset = 0;
@@ -215,15 +207,12 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                     resetScroll = true;
                 }
             }
-
             placePickerAdapter = new PlacePickerAdapter(getApplicationContext(), frsResults);
-            placePicker.setAdapter(placePickerAdapter); // CDA FIX - Anyway to force to scroll to last known position?
+            placePicker.setAdapter(placePickerAdapter);
 
-            // CDA Scroll Test
-//            LinearLayoutManager manager = (LinearLayoutManager) placePicker.getLayoutManager();
+            // Reset the scroll after updating the placePickerAdapter // CDA todo is there a better way to do this?
             if (resetScroll)
                 manager.scrollToPositionWithOffset(firstItem, (int) topOffset);
-//            manager.scrollToPositionWithOffset(mStatePos, (int) mStateOffset);
 
             return;
         }
@@ -237,6 +226,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
             if (mLastLocation != null ) {
 
                 // ***
+                // SEARCH FOR VENUES
                 // Find venues matching the search criteria
                 // Builds Retrofit and FoursquareService objects for calling the Foursquare API and parsing with GSON
                 Retrofit retrofit = new Retrofit.Builder()
@@ -284,6 +274,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                         spinner.setVisibility(View.GONE);
 
                         // ***
+                        // GET THE RATINGS FOR EACH VENUE
                         // Go thru each of the venues and get the ratings with another call to /venues/VENUE_ID
                         // for venues[0..n], Get the rating & rating color.
                         // Fill in frs.rating with the rating from /venues/VENUE_ID endpoint
@@ -300,6 +291,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                                     @Override
                                     public void onResponse(Call<FoursquareJSON> call, Response<FoursquareJSON> response) {
 
+                                        // No response body? Prolly cuz quota exceeded
                                         if(response.body() == null) {
                                             try {
                                                 JSONObject jObjError = new JSONObject(response.errorBody().string());
@@ -389,17 +381,6 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         // killed and restarted.
         savedInstanceState.putSerializable("frsResults", frsResults);
 
-        // CDA Test scroll
-        // Save the scroll state
-        LinearLayoutManager manager = (LinearLayoutManager) placePicker.getLayoutManager();
-        if ( manager != null) {
-            int firstItem = manager.findFirstVisibleItemPosition();
-            View firstItemView = manager.findViewByPosition(firstItem);
-            float topOffset = firstItemView.getTop();
-            savedInstanceState.putInt("scrollPosition", firstItem);
-            savedInstanceState.putFloat("scrollOffset", topOffset);
-        }
-
         super.onSaveInstanceState(savedInstanceState);
     }
 
@@ -410,12 +391,6 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         // This bundle has also been passed to onCreate.
 
         frsResults = (ArrayList<FoursquareResults>)savedInstanceState.getSerializable("frsResults");
-
-        // CDA Test Scroll
-        // Restore the scroll state
-        mStatePos = savedInstanceState.getInt("scrollPosition");
-        mStateOffset = savedInstanceState.getFloat("scrollOffset");
-
     }
 
     @Override
