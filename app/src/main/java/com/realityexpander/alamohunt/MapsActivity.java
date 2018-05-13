@@ -28,6 +28,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
@@ -357,11 +358,13 @@ public class MapsActivity extends AppCompatActivity
 
         // Zoom Fudge factor for single venue height layout // CDA todo fix this to reflect view size for map from resources
         if(venuesList.size()==1) {
-             if( w > h)
-                 mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, 400));
+             if( w > h) // landscape
+                 mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, h/3));
             else {
-                padding = Math.max( 400, h/4);
-                 mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, padding));
+
+                 padding = Math.max( 250, h/5);
+                 Log.d("CDA", "w:"+w +",h:"+h+",padding:"+padding);
+                 mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h/2, padding));
              }
         }
         else
@@ -383,7 +386,11 @@ public class MapsActivity extends AppCompatActivity
 
         // one or multiple venues?
         if(venuesList.size()==1) {
-            if (!marker.equals(markerAustin)) { // Dont show info for austin
+            if (marker.equals(markerAustin)) {
+                // Opens the Foursquare venue page when a user clicks on the info window of the venue
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.drafthouse.com"));
+                startActivity(browserIntent);
+            } else {
                 // Opens the Foursquare venue page when a user clicks on the info window of the venue
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(venuesList.get(CURRENT_VENUE).getVenueURL()));
                 startActivity(browserIntent);
