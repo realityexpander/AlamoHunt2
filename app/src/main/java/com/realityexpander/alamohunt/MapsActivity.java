@@ -370,7 +370,8 @@ public class MapsActivity extends AppCompatActivity
             } else
                 mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, padding));
         } catch (Exception e) {
-            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, padding));
+            // Screen is too small for the view, so do safe default padding and size
+            mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, 150));
             Log.d("DEADBEEF", "Map Centering Error - w:" + w + ",h:" + h + ",padding:" + padding);
         }
 
