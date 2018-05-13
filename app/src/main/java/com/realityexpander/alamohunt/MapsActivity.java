@@ -317,7 +317,7 @@ public class MapsActivity extends AppCompatActivity
 
         int w = getResources().getDisplayMetrics().widthPixels;
         int h = getResources().getDisplayMetrics().heightPixels;
-        int padding = (int) (w * 0.22); // offset from edges of the map 22% of screen
+        int padding = (int) (w * 0.3); // offset from edges of the map 22% of screen
 
         // ***
         // Creates and displays marker and info window for the venue
@@ -359,8 +359,10 @@ public class MapsActivity extends AppCompatActivity
         if(venuesList.size()==1) {
              if( w > h)
                  mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, 400));
-            else
-                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, 400));
+            else {
+                padding = Math.max( 400, h/4);
+                 mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, padding));
+             }
         }
         else
             mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, padding));
