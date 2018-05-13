@@ -5,9 +5,9 @@ interest, such as Tacos. Displays ratings for each venue, distance from the cent
 ability to favorite any venue, which persists between use of the app.
 
 - Uses live autocomplete search in main screen dropdown menu
-- Main screen list shows venue details such as Distance from Austin
+- Main screen list shows venue details such as Distance from Austin, Ratings, If Favorited
 - Shows map of all venues via a floating action button.
-- Map allows selection of individual venue
+- Map allows selection of individual venue & Center of Austin
 - Each individual venue activity shows details of venue and allow to view on Foursquare site
   or the website for the venue.
 - Uses collaping menu to show individual venue details
