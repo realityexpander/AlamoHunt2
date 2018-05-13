@@ -364,14 +364,14 @@ public class MapsActivity extends AppCompatActivity
                 else {
 
                     padding = Math.max(250, h / 5);
-                    Log.d("CDA", "w:" + w + ",h:" + h + ",padding:" + padding);
+                    Log.d("DEADBEEF", "w:" + w + ",h:" + h + ",padding:" + padding);
                     mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h / 2, padding));
                 }
             } else
                 mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, padding));
         } catch (Exception e) {
             mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, padding));
-            Log.d("CDA", "Map Centering Error - w:" + w + ",h:" + h + ",padding:" + padding);
+            Log.d("DEADBEEF", "Map Centering Error - w:" + w + ",h:" + h + ",padding:" + padding);
         }
 
         marker.showInfoWindow();

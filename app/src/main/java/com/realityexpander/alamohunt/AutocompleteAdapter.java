@@ -82,7 +82,7 @@ public class AutocompleteAdapter extends ArrayAdapter<Venue> {
                         // (Done synchronously here, we are already off the UI thread)
                         mVenues = findVenues(term);
                     } catch (Exception e) {
-                        Log.d("CDA", "EXCEPTION " + e);
+                        Log.d("DEADBEEF", "EXCEPTION " + e);
                     }
                     filterResults.values = mVenues;
                     if(mVenues != null)
@@ -177,7 +177,7 @@ public class AutocompleteAdapter extends ArrayAdapter<Venue> {
 
 
         } catch (Exception e) {
-            Log.d("CDA", "EXCEPTION " + e);
+            Log.d("DEADBEEF", "EXCEPTION " + e);
             Toast.makeText(mContext, "Can't connect to Foursquare's servers!", Toast.LENGTH_LONG).show();
             return null;
         }

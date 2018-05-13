@@ -248,7 +248,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                                                                         .get("meta"))
                                                                         .getString("errorDetail"), Toast.LENGTH_LONG).show();
                             } catch (Exception e) {
-                                Log.d("CDA", "EXCEPTION " + e);
+                                Log.d("DEADBEEF", "EXCEPTION " + e);
                                 Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                             }
                             finish();
@@ -335,7 +335,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                                 });
 
                             } catch (Exception e) {
-                                Log.d("CDA", "EXCEPTION " + e);
+                                Log.d("DEADBEEF", "EXCEPTION " + e);
                                 Toast.makeText(getApplicationContext(), "Can't connect to Foursquare's servers!", Toast.LENGTH_LONG).show();
                                 finish();
                             }
