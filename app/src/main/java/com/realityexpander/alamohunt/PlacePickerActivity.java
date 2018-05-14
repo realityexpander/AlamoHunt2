@@ -92,12 +92,6 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         placePicker.setLayoutManager(placePickerManager);
         placePicker.addItemDecoration(new DividerItemDecoration(placePicker.getContext(), placePickerManager.getOrientation()));
 
-
-        // Get saved instance foursquare data for orientation change
-        if (savedInstanceState != null && savedInstanceState.containsKey("frsResults")) {
-            frsResults = (ArrayList<FoursquareResults>)savedInstanceState.getSerializable("frsResults");
-        }
-
         // Setup the toolbar UI elements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(android.support.design.R.drawable.abc_ic_ab_back_material);
@@ -109,6 +103,12 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                 finish();
             }
         });
+
+        // Get saved instance foursquare data for orientation change
+        if (savedInstanceState != null && savedInstanceState.containsKey("frsResults")) {
+            frsResults = (ArrayList<FoursquareResults>)savedInstanceState.getSerializable("frsResults");
+            toolbar.setTitle("Search: " + searchString);
+        }
 
         spinner = (ProgressBar)findViewById(R.id.progressBar1);
 
