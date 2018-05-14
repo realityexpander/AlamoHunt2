@@ -17,6 +17,7 @@ APIs & Libraries
 - Picasso for async image loading
 - Lottie for animation
 - Retrofit for async endpoint loading and forming queries
+  - Good example of chaining requests asynchronously
 
 
 Refactors for version 2
