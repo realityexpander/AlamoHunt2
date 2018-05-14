@@ -101,6 +101,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         // Setup the toolbar UI elements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setNavigationIcon(android.support.design.R.drawable.abc_ic_ab_back_material);
+        toolbar.setTitle("Searching...");
         setSupportActionBar(toolbar);
         toolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,7 +111,6 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         });
 
         spinner = (ProgressBar)findViewById(R.id.progressBar1);
-
 
         // The FAB shows all the venues for the MapsActivity
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -166,6 +166,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
 
         // Creates a connection to the Google API for location services
+        // CDA we currently dont use the users gps location
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -180,9 +181,6 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
     @Override
     public void onConnected(Bundle connectionHint) {
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle("Search: " + searchString);
 
         // Already loaded data from the Foursquare? (Orientation change/nav back from prev activity)
         if (frsResults != null) {
@@ -269,6 +267,8 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
                         frsResults = frs;
 
+                        Toolbar toolbar = findViewById(R.id.toolbar);
+                        toolbar.setTitle("Search: " + searchString);
                         spinner.setVisibility(View.GONE);
 
                         // ***

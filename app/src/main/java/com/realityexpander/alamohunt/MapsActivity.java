@@ -76,8 +76,7 @@ public class MapsActivity extends AppCompatActivity
     private static final int CURRENT_VENUE = 0;
 
     // The base URL for the Foursquare API
-    private String foursquareBaseURL = "https://api.foursquare.com/v2/";
-
+    private String foursquareBaseURL;
     // The client ID and client secret for authenticating with the Foursquare API
     private String foursquareClientID;
     private String foursquareClientSecret;
@@ -174,15 +173,15 @@ public class MapsActivity extends AppCompatActivity
             // *** GET VENUE DETAILS FROM FOURSQUARE API
             // Get details for the venueID
             // Builds Retrofit and FoursquareService objects for calling the Foursquare API and parsing with GSON
+            // Gets the stored Foursquare API client ID and client secret from XML
+            foursquareBaseURL = getResources().getString(R.string.foursquare_base_URL);
+            foursquareClientID = getResources().getString(R.string.foursquare_client_id);
+            foursquareClientSecret = getResources().getString(R.string.foursquare_client_secret);
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(foursquareBaseURL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
             FoursquareService foursquare = retrofit.create(FoursquareService.class);
-
-            // Gets the stored Foursquare API client ID and client secret from XML
-            foursquareClientID = getResources().getString(R.string.foursquare_client_id);
-            foursquareClientSecret = getResources().getString(R.string.foursquare_client_secret);
 
             // Calls the Foursquare API to get venue details
             Call<FoursquareJSON> searchCall = foursquare.searchVenueID(
@@ -356,7 +355,8 @@ public class MapsActivity extends AppCompatActivity
         }
         LatLngBounds bounds = builder.build();
 
-        // Zoom Fudge factor for single venue height layout // CDA todo fix this to reflect view size for map from resources
+        // Zoom Fudge factor for single venue height layout
+        // CDA todo fix this to reflect view size of map from resources
         try {
             if (venuesList.size() == 1) {
                 if (w > h) // landscape
