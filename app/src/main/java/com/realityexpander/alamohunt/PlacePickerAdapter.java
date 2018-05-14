@@ -39,7 +39,6 @@ public class PlacePickerAdapter extends RecyclerView.Adapter<PlacePickerAdapter.
 
     private static final double AUSTIN_TX_LATITUDE = 30.2672;
     private static final double AUSTIN_TX_LONGITUDE = -97.7431;
-
     private static final int FIRST_CATEGORY = 0;
 
     // The list of frsResults from the Foursquare API

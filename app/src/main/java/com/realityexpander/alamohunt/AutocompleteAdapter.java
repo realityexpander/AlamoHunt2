@@ -147,8 +147,8 @@ public class AutocompleteAdapter extends ArrayAdapter<Venue> {
 
             if(response.body() == null) {
                 try {
+                    // Get the error message from Foursquare server
                     JSONObject jObjError = new JSONObject(response.errorBody().string());
-
                     Toast.makeText(mContext, ((JSONObject)jObjError.get("meta")).getString("errorDetail"), Toast.LENGTH_LONG).show();
                 } catch (Exception e) {
                     Toast.makeText(mContext, e.getMessage(), Toast.LENGTH_LONG).show();

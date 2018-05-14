@@ -386,7 +386,6 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         super.onRestoreInstanceState(savedInstanceState);
         // Restore UI state from the savedInstanceState.
         // This bundle has also been passed to onCreate.
-
         frsResults = (ArrayList<FoursquareResults>)savedInstanceState.getSerializable("frsResults");
     }
 
