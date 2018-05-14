@@ -14,6 +14,7 @@ ability to favorite any venue, which persists between use of the app.
 - Properly adheres to android UI standards
 
 ## APIs & Libraries
+- Foursquare for venue recommendations
 - Picasso for async image loading
 - Lottie for animation
 - Retrofit for async endpoint loading and forming queries
