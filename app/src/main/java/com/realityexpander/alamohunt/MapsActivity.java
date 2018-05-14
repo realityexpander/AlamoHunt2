@@ -106,11 +106,9 @@ public class MapsActivity extends AppCompatActivity
             // *** FILL IN BASIC DETAILS OF VENUE
             // Fill in data field views for Single venue details
             final Venue cv = venuesList.get(CURRENT_VENUE); // current venue from picker
-
             ImageView ivCategoryIcon = (ImageView) findViewById(R.id.ivCategoryIcon);
             if ( cv.getCategoryIconURL() != null)
                 Picasso.with(getApplicationContext()).load(cv.getCategoryIconURL()).into(ivCategoryIcon);
-
             final TextView tvVenueName = (TextView) findViewById(R.id.tvVenueName);
             tvVenueName.setText(cv.getName());
             final TextView tvCategoryName = (TextView) findViewById(R.id.tvCategoryName);
@@ -120,6 +118,7 @@ public class MapsActivity extends AppCompatActivity
             final TextView tvVenueRating = (TextView) findViewById(R.id.tvFoursquareRating);
             tvVenueURL.setText(cv.getVenueURL());
 
+            // These will be pulled from the Foursquare servers asynchronously
             final TextView tvFoursquareWebsite = (TextView) findViewById(R.id.tvFoursquareWebsite);
             final TextView tvLikesCount = (TextView) findViewById(R.id.tvLikesCount);
             final TextView tvPhoneNumber = (TextView) findViewById(R.id.tvPhoneNumber);
@@ -137,7 +136,7 @@ public class MapsActivity extends AppCompatActivity
             if (favoriteVenueIDs == null)
                 favoriteVenueIDs = new ArrayList<>();
 
-            // *** FAB behavior
+            // *** FAB BEHAVIOR
             // The FAB favorites the venue true/false
             final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
             fab.setImageResource(android.R.drawable.star_big_off); // default to off
@@ -211,7 +210,7 @@ public class MapsActivity extends AppCompatActivity
                         FoursquareVenue fv = fr.venue;
 
                         // ***
-                        // FILL OUT THE VENUE DATA
+                        // FILL OUT THE EXTENDED VENUE DATA
                         tvVenueName.setText(fv.name);
                         tvVenueURL.setText(fv.url);
                         if (fv.rating > 0) {
@@ -220,7 +219,6 @@ public class MapsActivity extends AppCompatActivity
                                 tvVenueRating.setBackgroundColor(Color.parseColor("#" + fv.ratingColor));
                         } else
                             tvVenueRating.setVisibility(View.INVISIBLE);
-
                         tvFoursquareWebsite.setText(fv.canonicalUrl);
                         tvLikesCount.setText("Likes: " + Integer.toString(fv.likes.count));
                         tvPhoneNumber.setText(fv.contact.formattedPhone);
