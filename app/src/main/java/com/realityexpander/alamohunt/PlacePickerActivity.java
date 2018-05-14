@@ -54,7 +54,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
     // The TextView for displaying the current location
     private ProgressBar spinner;
 
-    // The RecyclerView and associated objects for displaying the nearby coffee spots
+    // The RecyclerView and associated objects for displaying the nearby venues
     private RecyclerView placePicker;
     private LinearLayoutManager placePickerManager;
     private RecyclerView.Adapter placePickerAdapter;
@@ -93,7 +93,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
         placePicker.addItemDecoration(new DividerItemDecoration(placePicker.getContext(), placePickerManager.getOrientation()));
 
 
-        // Get saved instance data for orientation change
+        // Get saved instance foursquare data for orientation change
         if (savedInstanceState != null && savedInstanceState.containsKey("frsResults")) {
             frsResults = (ArrayList<FoursquareResults>)savedInstanceState.getSerializable("frsResults");
         }
@@ -155,7 +155,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                                                 getString(R.string.FoursquareIconURLPrefix)+frsResults.get(n).venue.id
                     ) );
                 }
-                // Passes the crucial venue details onto the map view
+                // Passes the crucial venue details for the map view
                 i.putExtra("venuesList", venueResults);
                 i.putExtra("_search", searchString);
 
@@ -166,7 +166,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
 
 
         // Creates a connection to the Google API for location services
-        // CDA we currently dont use the users gps location
+        // CDA we currently don't use the users gps location
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
@@ -272,7 +272,7 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                         spinner.setVisibility(View.GONE);
 
                         // ***
-                        // GET THE RATINGS FOR EACH VENUE
+                        // GET THE RATING FOR EACH VENUE
                         // Go thru each of the venues and get the ratings with another call to /venues/VENUE_ID
                         // for venues[0..n], Get the rating & rating color.
                         // Fill in frs.rating with the rating from /venues/VENUE_ID endpoint
