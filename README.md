@@ -9,7 +9,7 @@ ability to favorite any venue, which persists between use of the app.
 - Shows map of all venues via a floating action button.
 - Map allows selection of individual venue & Center of Austin
 - Each individual venue activity shows details of venue and allow to view on Foursquare site
-  or the website for the venue.
+  or the website for the venue, or the menu if available
 - Uses collaping menu to show individual venue details
 - Properly adheres to android UI standards
 
@@ -18,6 +18,8 @@ APIs & Libraries
 - Lottie for animation
 - Retrofit for async endpoint loading and forming queries
   - Good example of chaining requests asynchronously
+- Handles back button and search button for virtual keyboard
+- 
 
 
 Refactors for version 2
