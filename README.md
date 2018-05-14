@@ -1,4 +1,4 @@
-# AlamoHunt
+## AlamoHunt
 
 This app searches for places and recommendations using Foursquare's places API for Austin venues of 
 interest, such as Tacos. Displays ratings for each venue, distance from the center of Austin and
@@ -13,16 +13,16 @@ ability to favorite any venue, which persists between use of the app.
 - Uses collaping menu to show individual venue details
 - Properly adheres to android UI standards
 
-APIs & Libraries
+# APIs & Libraries
 - Picasso for async image loading
 - Lottie for animation
 - Retrofit for async endpoint loading and forming queries
   - Good example of chaining requests asynchronously
 - Handles back button and search button for virtual keyboard
-- 
+- Snaps the Place picker list back to proper position after navigating screens
 
 
-Refactors for version 2
+# Refactors for version 2
 - possibly use only one kind of venue object for the Foursquare data and the internal data
 - Make UI prettier
 - Add more details to individual venue details activity
