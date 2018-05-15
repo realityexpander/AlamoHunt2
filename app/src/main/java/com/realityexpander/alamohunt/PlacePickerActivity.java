@@ -200,6 +200,8 @@ public class PlacePickerActivity extends AppCompatActivity implements GoogleApiC
                     resetScroll = true;
                 }
             }
+
+            // Set the data of the list picker to the previously loaded frsResults
             placePickerAdapter = new PlacePickerAdapter(getApplicationContext(), frsResults);
             placePicker.setAdapter(placePickerAdapter);
 

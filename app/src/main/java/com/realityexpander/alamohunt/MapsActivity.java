@@ -1,18 +1,18 @@
 /**
  * Filename: MapsActivity.java
  * Author: Chris Athanas
- *
+ * <p>
  * MapActivity represents a map view of either a specific venue or multiple venues
  * from PlacePickerActivity.
- *
+ * <p>
  * - If a single venue, show the venue details UI elements of the activity_maps.xml
- *   - Show venue & city center of austin on map
- *   - Show details of venue
- *   - Uses a collapsing toolbar to hide map and show all details
- *   - Allow user to favorite or unfavorite a venue
+ * - Show venue & city center of austin on map
+ * - Show details of venue
+ * - Uses a collapsing toolbar to hide map and show all details
+ * - Allow user to favorite or unfavorite a venue
  * - If multiple venues, hide the venue details and display the map of all venues.
- *   - Hide the venue details
- *   - Clicking on a venue opens up the single venue view
+ * - Hide the venue details
+ * - Clicking on a venue opens up the single venue view
  */
 
 package com.realityexpander.alamohunt;
@@ -65,25 +65,23 @@ import static android.view.View.VISIBLE;
 public class MapsActivity extends AppCompatActivity
         implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener {
 
-    // The Google Maps object.
-    private GoogleMap mMap;
-
-    // The details of the venue that is being displayed.
-    private ArrayList<Venue> venuesList;
-    private Marker markerAustin;
+    public static final String FAVORITE_VENUE_IDS = "favoriteVenueIDs";
     private static final double AUSTIN_TX_LATITUDE = 30.2672;
     private static final double AUSTIN_TX_LONGITUDE = -97.7431;
     private static final int CURRENT_VENUE = 0;
-
+    ArrayList<String> favoriteVenueIDs;
+    boolean favorited; // Current venue favorited
+    String searchString; // String from prev activity intent
+    // The Google Maps object.
+    private GoogleMap mMap;
+    // The details of the venue that is being displayed.
+    private ArrayList<Venue> venuesList;
+    private Marker markerAustin;
     // The base URL for the Foursquare API
     private String foursquareBaseURL;
     // The client ID and client secret for authenticating with the Foursquare API
     private String foursquareClientID;
     private String foursquareClientSecret;
-
-    ArrayList<String> favoriteVenueIDs;
-    boolean favorited; // Current venue favorited
-    String searchString; // String from prev activity intent
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +89,7 @@ public class MapsActivity extends AppCompatActivity
         setContentView(R.layout.activity_maps);
 
         // Retrieves venue(s) details from the intent sent from PlacePickerActivity
-        venuesList = (ArrayList<Venue>)getIntent().getSerializableExtra("venuesList");
+        venuesList = (ArrayList<Venue>) getIntent().getSerializableExtra("venuesList");
 
         SupportMapFragment mapFragment;
         if (venuesList.size() == 1) { // *** Show Single venue screen
@@ -107,7 +105,7 @@ public class MapsActivity extends AppCompatActivity
             // Fill in data field views for Single venue details
             final Venue cv = venuesList.get(CURRENT_VENUE); // current venue from picker
             ImageView ivCategoryIcon = (ImageView) findViewById(R.id.ivCategoryIcon);
-            if ( cv.getCategoryIconURL() != null)
+            if (cv.getCategoryIconURL() != null)
                 Picasso.with(getApplicationContext()).load(cv.getCategoryIconURL()).into(ivCategoryIcon);
             final TextView tvVenueName = (TextView) findViewById(R.id.tvVenueName);
             tvVenueName.setText(cv.getName());
@@ -139,35 +137,7 @@ public class MapsActivity extends AppCompatActivity
             // *** FAB BEHAVIOR
             // The FAB favorites the venue true/false
             final FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-            fab.setImageResource(android.R.drawable.star_big_off); // default to off
-            // Set the favorite status on the button
-            for (int i = 0; i < favoriteVenueIDs.size(); i++)
-                if (favoriteVenueIDs.get(i).equals(cv.getId())) {
-                    favorited = true;
-                    fab.setImageResource(android.R.drawable.star_big_on);
-                }
-            fab.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // Toggle the favorites
-                    if (!favorited) {
-                        // toggle the button image to favorited
-                        fab.setImageResource(android.R.drawable.star_big_on);
-                        favorited = true;
-                        favoriteVenueIDs.add(cv.getId());
-                        SavePrefs(favoriteVenueIDs, "favoriteVenueIDs");
-                    } else {
-                        // toggle the button image
-                        fab.setImageResource(android.R.drawable.star_big_off);
-                        favorited = false;
-                        for (int i = 0; i < favoriteVenueIDs.size(); i++)
-                            if (cv.getId().equals(favoriteVenueIDs.get(i)))
-                                favoriteVenueIDs.remove(i);
-
-                        SavePrefs(favoriteVenueIDs, "favoriteVenueIDs");
-                    }
-                }
-            });
+            setupFabButton(fab, cv);
 
             // *** GET VENUE DETAILS FROM FOURSQUARE API
             // Get details for the venueID
@@ -187,63 +157,63 @@ public class MapsActivity extends AppCompatActivity
                     venuesList.get(CURRENT_VENUE).getId(),
                     foursquareClientID,
                     foursquareClientSecret
-                    );
+            );
             searchCall.enqueue(new Callback<FoursquareJSON>() {
                 @Override
                 public void onResponse(Call<FoursquareJSON> call, Response<FoursquareJSON> response) {
 
-                        // Gets the venue object from the JSON response
-                        FoursquareJSON fjson = response.body();
+                    // Gets the venue object from the JSON response
+                    FoursquareJSON fjson = response.body();
 
-                        if(response.body() == null) { // no data from server?
-                            try {
-                                // pull error code from foursquare response
-                                JSONObject jObjError = new JSONObject(response.errorBody().string());
-                                Toast.makeText(getApplicationContext(), ((JSONObject)jObjError.get("meta")).getString("errorDetail"), Toast.LENGTH_LONG).show();
-                            } catch (Exception e) {
-                                Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
-                            }
-                            return;
+                    if (response.body() == null) { // no data from server?
+                        try {
+                            // pull error code from foursquare response
+                            JSONObject jObjError = new JSONObject(response.errorBody().string());
+                            Toast.makeText(getApplicationContext(), ((JSONObject) jObjError.get("meta")).getString("errorDetail"), Toast.LENGTH_LONG).show();
+                        } catch (Exception e) {
+                            Toast.makeText(getApplicationContext(), e.getMessage(), Toast.LENGTH_LONG).show();
                         }
+                        return;
+                    }
 
-                        FoursquareResponse fr = fjson.response;
-                        FoursquareVenue fv = fr.venue;
+                    FoursquareResponse fr = fjson.response;
+                    FoursquareVenue fv = fr.venue;
 
-                        // ***
-                        // FILL OUT THE EXTENDED VENUE DATA
-                        tvVenueName.setText(fv.name);
-                        tvVenueURL.setText(fv.url);
-                        if (fv.rating > 0) {
-                            tvVenueRating.setText("Rating: " + Double.toString(fv.rating));
-                            if (fv.ratingColor != null)
-                                tvVenueRating.setBackgroundColor(Color.parseColor("#" + fv.ratingColor));
-                        } else
-                            tvVenueRating.setVisibility(View.INVISIBLE);
-                        tvFoursquareWebsite.setText(fv.canonicalUrl);
-                        tvLikesCount.setText("Likes: " + Integer.toString(fv.likes.count));
-                        tvPhoneNumber.setText(fv.contact.formattedPhone);
-                        if (fv.contact.facebookUsername != null)
-                            tvFacebookUsername.setText("Facebook: " + fv.contact.facebookUsername);
-                        else
-                            tvFacebookUsername.setVisibility(GONE);
-                        if (fv.menu != null)
-                            tvMenuUrl.setText(fv.menu.mobileUrl);
-                        else
-                            tvMenuUrl.setVisibility(GONE);
-                        if (fv.location.formattedAddress.size() > 0) {
-                            String address = "";
-                            for (int i = 0; i < fv.location.formattedAddress.size(); i++) // Get each line of formatted address
-                                address += fv.location.formattedAddress.get(i) + "\n";
-                            tvAddress.setText(address);
-                        }
-                        if (fv.price != null) {
-                            tvFoursquarePrice.setText(fv.price.message + " " + fv.price.currency);
-                        } else
-                            tvFoursquarePrice.setVisibility(View.INVISIBLE);
-                        if (fv.hours != null)
-                            tvFoursquareHours.setText(fv.hours.status);
-                        else
-                            tvFoursquareHours.setVisibility(GONE);
+                    // ***
+                    // FILL OUT THE EXTENDED VENUE DATA
+                    tvVenueName.setText(fv.name);
+                    tvVenueURL.setText(fv.url);
+                    if (fv.rating > 0) {
+                        tvVenueRating.setText("Rating: " + Double.toString(fv.rating));
+                        if (fv.ratingColor != null)
+                            tvVenueRating.setBackgroundColor(Color.parseColor("#" + fv.ratingColor));
+                    } else
+                        tvVenueRating.setVisibility(View.INVISIBLE);
+                    tvFoursquareWebsite.setText(fv.canonicalUrl);
+                    tvLikesCount.setText("Likes: " + Integer.toString(fv.likes.count));
+                    tvPhoneNumber.setText(fv.contact.formattedPhone);
+                    if (fv.contact.facebookUsername != null)
+                        tvFacebookUsername.setText("Facebook: " + fv.contact.facebookUsername);
+                    else
+                        tvFacebookUsername.setVisibility(GONE);
+                    if (fv.menu != null)
+                        tvMenuUrl.setText(fv.menu.mobileUrl);
+                    else
+                        tvMenuUrl.setVisibility(GONE);
+                    if (fv.location.formattedAddress.size() > 0) {
+                        String address = "";
+                        for (int i = 0; i < fv.location.formattedAddress.size(); i++) // Get each line of formatted address
+                            address += fv.location.formattedAddress.get(i) + "\n";
+                        tvAddress.setText(address);
+                    }
+                    if (fv.price != null) {
+                        tvFoursquarePrice.setText(fv.price.message + " " + fv.price.currency);
+                    } else
+                        tvFoursquarePrice.setVisibility(View.INVISIBLE);
+                    if (fv.hours != null)
+                        tvFoursquareHours.setText(fv.hours.status);
+                    else
+                        tvFoursquareHours.setVisibility(GONE);
 
                 }
 
@@ -258,12 +228,12 @@ public class MapsActivity extends AppCompatActivity
         } else { // *** Show multi venue view
             mapFragment = (SupportMapFragment) getSupportFragmentManager()
                     .findFragmentById(R.id.map2);
-            
+
             // Get the search from prev screen intent
             Bundle extras = getIntent().getExtras();
             if (extras != null) {
                 searchString = extras.getString("_search");
-                setTitle("Search: "+ searchString);
+                setTitle("Search: " + searchString);
             }
 
             // Hide the single venue map view items
@@ -281,7 +251,42 @@ public class MapsActivity extends AppCompatActivity
         mapFragment.getMapAsync(this);
     }
 
-    public void SavePrefs( ArrayList<String> list, String key) {
+    private void setupFabButton(final FloatingActionButton fab, final Venue cv) {
+        fab.setImageResource(android.R.drawable.star_big_off); // default to off
+        // Set the favorite status on the button
+        for (int i = 0; i < favoriteVenueIDs.size(); i++)
+            if (favoriteVenueIDs.get(i).equals(cv.getId())) {
+                favorited = true;
+                fab.setImageResource(android.R.drawable.star_big_on);
+            }
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                toggleVenueFavorited(fab, cv);
+            }
+        });
+    }
+
+    private void toggleVenueFavorited(FloatingActionButton fab, Venue cv) {
+        // Toggle the favorites
+        if (!favorited) {
+            // toggle the button image to favorited
+            fab.setImageResource(android.R.drawable.star_big_on);
+            favorited = true;
+            favoriteVenueIDs.add(cv.getId());
+            SavePrefs(favoriteVenueIDs, FAVORITE_VENUE_IDS);
+        } else {
+            // toggle the button image
+            fab.setImageResource(android.R.drawable.star_big_off);
+            favorited = false;
+            for (int i = 0; i < favoriteVenueIDs.size(); i++)
+                if (cv.getId().equals(favoriteVenueIDs.get(i)))
+                    favoriteVenueIDs.remove(i);
+            SavePrefs(favoriteVenueIDs, FAVORITE_VENUE_IDS);
+        }
+    }
+
+    public void SavePrefs(ArrayList<String> list, String key) {
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         SharedPreferences.Editor editor = sharedPrefs.edit();
         Gson gson = new Gson();
@@ -290,7 +295,7 @@ public class MapsActivity extends AppCompatActivity
         editor.apply();
     }
 
-    public ArrayList<String> LoadPrefs( String key ) {
+    public ArrayList<String> LoadPrefs(String key) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         Gson gson = new Gson();
         String json = prefs.getString(key, null);
@@ -321,11 +326,27 @@ public class MapsActivity extends AppCompatActivity
         // Creates and displays marker and info window for the venue
         // If there is a single item in the array, then do a single venue layout.
         // If there are multiple items in the array, then do a multi-venue layout.
-        Marker marker=null;
+        Marker marker = null;
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        addAustinCenter(builder); // if venuesList has only one item, add the city of austin
+        marker = calcBoundingBoxForAllVenues(marker, builder);
+        LatLngBounds bounds = builder.build(); // finalize the bounds
+        setMapBounds(w, h, padding, bounds);
 
+        marker.showInfoWindow(); // show info on map for the last venue
+        mMap.setOnInfoWindowClickListener(this);
+
+        // Show my location on map
+        // Checks for location permissions at runtime (required for API >= 23)
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            // Shows the user's current location
+            mMap.setMyLocationEnabled(true);
+        }
+    }
+
+    private void addAustinCenter(LatLngBounds.Builder builder) {
         // For single venues, centers and zooms the map around the selected venue + city of Austin
-        if(venuesList.size() == 1) { // only one venue? Add center of austin
+        if (venuesList.size() == 1) { // only one venue? Add center of austin
             // Add center of Austin
             LatLng austinLatLong = new LatLng(AUSTIN_TX_LATITUDE, AUSTIN_TX_LONGITUDE);
             markerAustin = mMap.addMarker(new MarkerOptions()
@@ -336,12 +357,14 @@ public class MapsActivity extends AppCompatActivity
 
             // mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 250)); // CDA NOTE - calling this sometimes crashes...
         }
+    }
 
-         // Find the bounding box for the list of venues
-        for(int i=0; i<venuesList.size(); i++) {
+    private Marker calcBoundingBoxForAllVenues(Marker marker, LatLngBounds.Builder builder) {
+        // Find the bounding box for the list of venues
+        for (int i = 0; i < venuesList.size(); i++) {
             Double lat = venuesList.get(i).getLatitude();
             Double lng = venuesList.get(i).getLongitude();
-            LatLng venLatLong = new LatLng(lat, lng );
+            LatLng venLatLong = new LatLng(lat, lng);
 
             builder.include(venLatLong);
 
@@ -351,8 +374,10 @@ public class MapsActivity extends AppCompatActivity
                     .snippet(venuesList.get(i).getCategoryName()));
             venuesList.get(i).setMarker(marker);
         }
-        LatLngBounds bounds = builder.build();
+        return marker;
+    }
 
+    private void setMapBounds(int w, int h, int padding, LatLngBounds bounds) {
         // Zoom Fudge factor for single venue height layout
         // CDA todo fix this to reflect view size of map from resources
         try {
@@ -372,30 +397,21 @@ public class MapsActivity extends AppCompatActivity
             mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, w, h, 150));
             Log.d("DEADBEEF", "Map Centering Error - w:" + w + ",h:" + h + ",padding:" + padding);
         }
-
-        marker.showInfoWindow();
-        mMap.setOnInfoWindowClickListener(this);
-
-        // Show my location on map
-        // Checks for location permissions at runtime (required for API >= 23)
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            // Shows the user's current location
-            mMap.setMyLocationEnabled(true);
-        }
     }
 
     @Override
     public void onInfoWindowClick(Marker marker) {
 
         // one or multiple venues?
-        if(venuesList.size()==1) {
+        if (venuesList.size() == 1) {
             if (marker.equals(markerAustin)) {
                 // Opens the Foursquare venue page when a user clicks on the info window of the venue
                 Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.drafthouse.com"));
                 startActivity(browserIntent);
             } else {
                 // Opens the Foursquare venue page when a user clicks on the info window of the venue
-                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(venuesList.get(CURRENT_VENUE).getVenueURL()));
+                Intent browserIntent = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse(venuesList.get(CURRENT_VENUE).getVenueURL()));
                 startActivity(browserIntent);
             }
         } else {
@@ -404,7 +420,7 @@ public class MapsActivity extends AppCompatActivity
                 if (venuesList.get(i).getMarker().equals(marker)) {
                     Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
 
-                    // Build the one-item venue list
+                    // Build a one-item venue list
                     ArrayList<Venue> venueResults = new ArrayList<>();
                     venueResults.add(new Venue(
                             venuesList.get(i).getName(),
@@ -416,7 +432,7 @@ public class MapsActivity extends AppCompatActivity
                             venuesList.get(i).getVenueURL()));
                     // Passes the crucial venue details onto the map view
                     intent.putExtra("venuesList", venueResults);
-                    intent.putExtra( "_search", searchString );
+                    intent.putExtra("_search", searchString);
                     startActivity(intent);
                 }
             }

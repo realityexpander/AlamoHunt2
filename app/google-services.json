@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "467079290352",
+    "firebase_url": "https://mymessagerapp-7f736.firebaseio.com",
+    "project_id": "mymessagerapp-7f736",
+    "storage_bucket": "mymessagerapp-7f736.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:467079290352:android:a65865b5b0086963",
+        "android_client_info": {
+          "package_name": "com.realityexpander.alamohunt"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "467079290352-92dhsbtotp388jnuqhgerq5ibatf5k2j.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.realityexpander.alamohunt",
+            "certificate_hash": "0a52dac1dce9c3d243dc10741f6dfcde02fc304d"
+          }
+        },
+        {
+          "client_id": "467079290352-m7mtgdpecl9c8j45jim57aorfhgil6um.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMugYCRAnGVDnRLTp4tgFi3frYoYErD9w"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "467079290352-m7mtgdpecl9c8j45jim57aorfhgil6um.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
